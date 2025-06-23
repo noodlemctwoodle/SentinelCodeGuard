@@ -1,8 +1,8 @@
 {
   "name": "sentinelcodeguard",
-  "displayName": "SentinelCodeGuard",
-  "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates",
-  "version": "1.0.0",
+  "displayName": "SentinelCodeGuard (Beta)",
+  "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
+  "version": "0.0.1-beta",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -28,7 +28,9 @@
     "attack",
     "codeguard",
     "detection",
-    "threat-hunting"
+    "threat-hunting",
+    "beta",
+    "preview"
   ],
   "homepage": "https://sentinel.blog",
   "repository": {
