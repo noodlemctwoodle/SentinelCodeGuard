@@ -1,0 +1,86 @@
+# Microsoft Sentinel Analytics Rule - Behavior Analytics Detection Template
+# Uses BehaviorAnalytics and IdentityInfo tables for anomaly detection
+
+id: "{{GUID}}"
+name: "Anomalous User Behavior Detection"
+description: |
+  'Detects users with anomalous behavior patterns based on Microsoft Sentinel behavior analytics data'
+severity: "Medium"
+requiredDataConnectors:
+  - connectorId: "BehaviorAnalytics"
+    dataTypes:
+      - "BehaviorAnalytics"
+  - connectorId: "AzureActiveDirectory"
+    dataTypes:
+      - "IdentityInfo"
+queryFrequency: "PT1H"
+queryPeriod: "P1D"
+triggerOperator: "gt"
+triggerThreshold: 0
+status: "Available"
+tactics:
+  - "InitialAccess"
+  - "DefenseEvasion"
+techniques:
+  - "T1078"
+  - "T1562"
+tags:
+  - "BehaviorAnalytics"
+  - "AnomalyDetection"
+  - "UEBA"
+query: |
+  let lookback = 1d;
+  
+  BehaviorAnalytics
+  | where TimeGenerated >= ago(lookback)
+  | where ActivityType in ("LogOn", "FailedLogOn")
+  | where InvestigationPriority > 1  // Focus on higher priority anomalies
+  | join kind=leftouter (
+      IdentityInfo
+      | where TimeGenerated >= ago(30d)
+      | summarize arg_max(TimeGenerated, *) by AccountUPN
+      | project AccountUPN, Department, JobTitle, Manager
+  ) on $left.UserPrincipalName == $right.AccountUPN
+  | extend
+      AnomalyScore = InvestigationPriority,
+      RiskLevel = case(
+          InvestigationPriority >= 3, "High",
+          InvestigationPriority >= 2, "Medium",
+          "Low"
+      ),
+      UserContext = strcat("Dept: ", Department, " | Role: ", JobTitle)
+  | where AnomalyScore >= 2  // Filter for medium+ risk
+  | project 
+      TimeGenerated,
+      UserPrincipalName,
+      ActivityType,
+      AnomalyScore,
+      RiskLevel,
+      UserContext,
+      SourceIPAddress,
+      SourceDevice,
+      DestinationIPAddress
+entityMappings:
+  - entityType: "Account"
+    fieldMappings:
+      - identifier: "FullName"
+        columnName: "UserPrincipalName"
+  - entityType: "IP"
+    fieldMappings:
+      - identifier: "Address"
+        columnName: "SourceIPAddress"
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration:
+    enabled: true
+    reopenClosedIncident: false
+    lookbackDuration: "PT6H"
+    matchingMethod: "AllEntities"
+    groupByEntities: ["Account"]
+customDetails:
+  AnomalyScore: "AnomalyScore"
+  RiskAssessment: "RiskLevel"
+  UserDepartment: "Department"
+  UserRole: "JobTitle"
+version: "1.0.0"
+kind: "Scheduled"

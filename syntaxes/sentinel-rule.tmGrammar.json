@@ -1,0 +1,129 @@
+{
+  "name": "Sentinel Analytics Rule",
+  "scopeName": "source.yaml.sentinel",
+  "fileTypes": [
+    "sentinel.yaml",
+    "sentinel.yml"
+  ],
+  "patterns": [
+    {
+      "include": "#sentinel-fields"
+    },
+    {
+      "include": "source.yaml"
+    }
+  ],
+  "repository": {
+    "sentinel-fields": {
+      "patterns": [
+        {
+          "name": "keyword.other.sentinel.required",
+          "match": "^\\s*(id|name|description|severity|requiredDataConnectors|queryFrequency|queryPeriod|triggerOperator|triggerThreshold|tactics|query|entityMappings|version|kind)\\s*:",
+          "captures": {
+            "1": {
+              "name": "entity.name.tag.yaml"
+            }
+          }
+        },
+        {
+          "name": "keyword.other.sentinel.optional",
+          "match": "^\\s*(status|techniques|relevantTechniques|tags|incidentConfiguration|eventGroupingSettings|suppressionDuration|suppressionEnabled|alertDetailsOverride|customDetails)\\s*:",
+          "captures": {
+            "1": {
+              "name": "entity.name.tag.yaml"
+            }
+          }
+        },
+        {
+          "name": "constant.other.sentinel.severity",
+          "match": "\\b(Informational|Low|Medium|High)\\b"
+        },
+        {
+          "name": "constant.other.sentinel.tactic",
+          "match": "\\b(InitialAccess|Execution|Persistence|PrivilegeEscalation|DefenseEvasion|CredentialAccess|Discovery|LateralMovement|Collection|CommandAndControl|Exfiltration|Impact|ResourceDevelopment|Reconnaissance)\\b"
+        },
+        {
+          "name": "constant.other.sentinel.connector",
+          "match": "\\b(AzureActiveDirectory|SecurityEvents|Syslog|CommonSecurityLog|AzureActivity|Office365|MicrosoftCloudAppSecurity|AzureSecurityCenter|MicrosoftThreatProtection)\\b"
+        },
+        {
+          "name": "constant.other.sentinel.entity",
+          "match": "\\b(Account|IP|Host|File|Process|URL|DNS|FileHash|AzureResource|MailboxConfiguration|MailMessage|SubmissionMail)\\b"
+        },
+        {
+          "name": "constant.other.sentinel.technique",
+          "match": "\\bT[0-9]{4}(\\.[0-9]{3})?\\b"
+        },
+        {
+          "name": "string.unquoted.sentinel.guid",
+          "match": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        },
+        {
+          "name": "string.other.sentinel.duration",
+          "match": "\\bP([0-9]+D)?(T([0-9]+H)?([0-9]+M)?([0-9]+S)?)?\\b"
+        },
+        {
+          "name": "meta.embedded.kql",
+          "begin": "^\\s*(query)\\s*:\\s*\\|\\s*$",
+          "end": "^(?=\\s*[a-zA-Z_][a-zA-Z0-9_]*\\s*:)",
+          "beginCaptures": {
+            "1": {
+              "name": "entity.name.tag.yaml"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#kql-query"
+            }
+          ]
+        }
+      ]
+    },
+    "kql-query": {
+      "patterns": [
+        {
+          "name": "keyword.control.kql",
+          "match": "\\b(where|summarize|extend|project|join|union|let|datatable|print|search|distinct|top|sort|order|by|asc|desc|limit|take|skip|sample|evaluate|invoke|parse|split|extract|replace|trim|strlen|substring|strcat|case|iff|isnull|isempty|isnotempty|todynamic|tostring|toint|todouble|tobool|todatetime|totimespan)\\b"
+        },
+        {
+          "name": "keyword.operator.kql",
+          "match": "\\b(and|or|not|in|!in|contains|!contains|startswith|!startswith|endswith|!endswith|matches|regex|has|!has|hasprefix|!hasprefix|hassuffix|!hassuffix)\\b"
+        },
+        {
+          "name": "support.function.kql",
+          "match": "\\b(ago|now|datetime|timespan|bin|floor|ceiling|round|abs|sign|sqrt|exp|log|log10|pow|sin|cos|tan|asin|acos|atan|atan2|pi|degrees|radians|count|sum|avg|min|max|stdev|variance|percentile|dcount|dcountif|countif|sumif|avgif|minif|maxif|arg_max|arg_min|make_list|make_bag|make_set|array_length|bag_keys|treepath|bag_pack|bag_unpack|zip|range|repeat|series_add|series_subtract|series_multiply|series_divide|series_fit_line|series_fir|series_iir|series_outliers|series_periods_detect|series_periods_validate|series_seasonal|series_stats|series_stats_dynamic)\\b"
+        },
+        {
+          "name": "support.class.kql",
+          "match": "\\b(SigninLogs|AuditLogs|SecurityEvent|Syslog|CommonSecurityLog|AzureActivity|OfficeActivity|ThreatIntelligenceIndicator|SecurityAlert|SecurityIncident|Heartbeat|Event|WindowsEvent|SysmonEvent|DnsEvents|NetworkCommunications|ProcessCreate|FileCreateTime|ImageLoads|ProcessAccess|RawAccessRead|ProcessTerminate|DriverLoad|CreateRemoteThread|CreateService|BootConfiguration|ConfigurationChange|Registry|FileCreate|FileCreateStreamHash|FileDelete|PipeEvent|WmiEvent)\\b"
+        },
+        {
+          "name": "string.quoted.double.kql",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.kql",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kql",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "comment.line.double-slash.kql",
+          "match": "//.*$"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,50 @@
+# Microsoft Sentinel Analytics Rule - Standard Template
+
+id: "{{GUID}}"
+name: "New Detection Rule"
+description: |
+  'Identifies suspicious activity that requires investigation'
+severity: "Medium"
+requiredDataConnectors:
+  - connectorId: "AzureActiveDirectory"
+    dataTypes:
+      - "SigninLogs"
+queryFrequency: "PT5M"
+queryPeriod: "P1D"
+triggerOperator: "gt"
+triggerThreshold: 0
+status: "Available"
+tactics:
+  - "InitialAccess"
+techniques:
+  - "T1078"
+tags:
+  - "SecurityOps"
+query: |
+  SigninLogs
+  | where TimeGenerated >= ago(1d)
+  | where ResultType != 0
+  | summarize FailedAttempts = count() by UserPrincipalName, IPAddress
+  | where FailedAttempts > 5
+entityMappings:
+  - entityType: "Account"
+    fieldMappings:
+      - identifier: "FullName"
+        columnName: "UserPrincipalName"
+  - entityType: "IP"
+    fieldMappings:
+      - identifier: "Address"
+        columnName: "IPAddress"
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration:
+    enabled: false
+    reopenClosedIncident: false
+    lookbackDuration: "PT5H"
+    matchingMethod: "AllEntities"
+eventGroupingSettings:
+  aggregationKind: "SingleAlert"
+suppressionDuration: "PT5H"
+suppressionEnabled: false
+version: "1.0.0"
+kind: "Scheduled"

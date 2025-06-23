@@ -1,0 +1,205 @@
+{
+    "Sentinel Analytics Rule Template": {
+        "prefix": "sentinel-rule",
+        "body": [
+            "# Microsoft Sentinel Analytics Rule",
+            "# ${1:Brief description of what this rule detects}",
+            "",
+            "id: \"${2:43dd2730-b8e1-4d63-89a1-de6e81402d6d}\"                                # Required: Unique GUID (generate using New-Guid or online tools)",
+            "name: \"${3:Detection Rule Name}\"                                               # Required: <50 chars, sentence case, descriptive",
+            "description: |                                                                  # Required: Max 5 sentences, start with \"Identifies\" or \"This query searches for\"",
+            "  '${4:Brief description of what this rule detects and why it matters.}'",
+            "severity: \"${5|High,Medium,Low,Informational|}\"                              # Required: Informational|Low|Medium|High (based on business impact)",
+            "requiredDataConnectors:                                                         # Required: List connectors needed, use [] if none",
+            "  - connectorId: \"${6|AzureActiveDirectory,SecurityEvents,Syslog,CommonSecurityLog,AzureActivity,Office365,MicrosoftCloudAppSecurity,AzureSecurityCenter|}\"                   # Must match official connector IDs",
+            "    dataTypes:                                                                  # List all required data types",
+            "      - \"${7|SigninLogs,SecurityEvent,Syslog,CommonSecurityLog,AzureActivity,OfficeActivity|}\"",
+            "queryFrequency: \"${8|PT5M,PT15M,PT30M,PT1H,PT4H,PT12H,P1D|}\"               # Required: How often to run (PT5M=5min, PT1H=1hour, P1D=1day)",
+            "queryPeriod: \"${9|P1D,PT12H,PT4H,PT1H|}\"                                    # Required: Time window to analyze (must be >= queryFrequency)",
+            "triggerOperator: \"${10|gt,lt,eq|}\"                                           # Required: Comparison operator (gt=greater than, lt=less than, eq=equals)",
+            "triggerThreshold: ${11:5}                                                       # Required: Threshold value (0-10000)",
+            "status: \"${12|Available,Disabled|}\"                                          # Optional: Available|Disabled (controls rule state)",
+            "tactics:                                                                        # Required: MITRE ATT&CK v16 tactics (no spaces in names)",
+            "  - \"${13|InitialAccess,Execution,Persistence,PrivilegeEscalation,DefenseEvasion,CredentialAccess,Discovery,LateralMovement,Collection,CommandAndControl,Exfiltration,Impact,ResourceDevelopment,Reconnaissance|}\"                       # Must be valid MITRE tactics",
+            "  - \"${14|InitialAccess,Execution,Persistence,PrivilegeEscalation,DefenseEvasion,CredentialAccess,Discovery,LateralMovement,Collection,CommandAndControl,Exfiltration,Impact,ResourceDevelopment,Reconnaissance|}\"",
+            "techniques:                                                                     # Required: MITRE ATT&CK technique IDs",
+            "  - \"${15:T1078}\"                                                             # Valid Accounts",
+            "  - \"${16:T1078.001}\"                                                         # Sub-techniques supported (Default Accounts)",
+            "tags:                                                                           # Required for custom rules (helps categorize)",
+            "  - \"${17:SecurityOps}\"",
+            "query: |                                                                        # Required: KQL query (10,000 char limit)",
+            "  ${18:SigninLogs}                                                              # Must return columns referenced in entityMappings",
+            "  | where TimeGenerated >= ago(1d)                                             # Include time filters for performance",
+            "  | where ResultType != 0                                                      # Filter failed logins",
+            "  | summarize FailedAttempts = count() by UserPrincipalName, IPAddress",
+            "  | where FailedAttempts > 5                                                   # Apply thresholds",
+            "entityMappings:                                                                 # MANDATORY: Map query results to entities (up to 10 mappings)",
+            "  - entityType: \"${19|Account,IP,Host,File,Process,URL,DNS,FileHash,AzureResource|}\"                 # Must be valid entity type",
+            "    fieldMappings:                                                             # Up to 3 identifiers per entity",
+            "      - identifier: \"${20|FullName,Name,NTDomain,UPNSuffix,Sid,AadUserId|}\" # Must match entity type identifiers",
+            "        columnName: \"${21:UserPrincipalName}\"                               # Must match query output column",
+            "      - identifier: \"Name\"",
+            "        columnName: \"AccountName\"",
+            "  - entityType: \"IP\"",
+            "    fieldMappings:",
+            "      - identifier: \"Address\"",
+            "        columnName: \"IPAddress\"",
+            "incidentConfiguration:                                                         # Optional: Controls incident creation and grouping",
+            "  createIncident: ${22|true,false|}                                            # Whether to create incidents from alerts",
+            "  groupingConfiguration:",
+            "    enabled: ${23|true,false|}                                                 # Enable alert grouping",
+            "    reopenClosedIncident: ${24|false,true|}                                    # Reopen closed incidents for related alerts",
+            "    lookbackDuration: \"${25|PT5H,PT24H,P7D|}\"                               # How far back to look for grouping",
+            "    matchingMethod: \"${26|AllEntities,AnyAlert,Selected|}\"                  # AllEntities|AnyAlert|Selected",
+            "    groupByEntities: [\"Account\", \"IP\"]                                     # Group by specific entity types",
+            "    groupByAlertDetails: []                                                    # Group by alert properties",
+            "    groupByCustomDetails: []                                                   # Group by custom detail fields",
+            "eventGroupingSettings:                                                         # Optional: Controls alert generation",
+            "  aggregationKind: \"${27|SingleAlert,AlertPerResult|}\"                      # SingleAlert=one per query, AlertPerResult=one per row",
+            "suppressionDuration: \"${28|PT5H,PT24H,P7D|}\"                                # Optional: Prevent duplicate alerts (ISO 8601 format)",
+            "suppressionEnabled: ${29|false,true|}                                         # Optional: Enable/disable suppression",
+            "alertDetailsOverride:                                                          # Optional: Dynamic alert customization",
+            "  alertDisplayNameFormat: \"${30:Failed login from {{IPAddress}} for {{UserPrincipalName}}}\"   # Max 3 params, 256 chars",
+            "  alertDescriptionFormat: \"${31:{{FailedAttempts}} failed attempts detected}\"                 # Max 3 params, 5000 chars",
+            "  alertSeverityColumnName: \"${32:DynamicSeverity}\"                          # Column name for dynamic severity",
+            "  alertTacticsColumnName: \"${33:DynamicTactics}\"                            # Column name for dynamic tactics",
+            "customDetails:                                                                 # Optional: Surface event data in alerts (up to 20 pairs)",
+            "  FailedAttemptCount: \"FailedAttempts\"                                       # Key: column name mapping",
+            "  SourceLocation: \"Location\"                                                # Improves analyst efficiency",
+            "  TimeWindow: \"TimeWindowAnalyzed\"",
+            "version: \"${34:1.0.0}\"                                                      # Required: Template version (increment for updates)",
+            "kind: \"${35|Scheduled,NRT,MicrosoftSecurityIncidentCreation|}\"             # Required: Rule type determines execution method"
+        ],
+        "description": "Complete Microsoft Sentinel Analytics Rule template with proper formatting and comments"
+    },
+    "Sentinel Rule - Minimal": {
+        "prefix": "sentinel-minimal",
+        "body": [
+            "id: \"${1:43dd2730-b8e1-4d63-89a1-de6e81402d6d}\"",
+            "name: \"${2:Rule Name}\"",
+            "description: |",
+            "  '${3:Identifies suspicious activity}'",
+            "severity: \"${4|Medium,High,Low,Informational|}\"",
+            "requiredDataConnectors:",
+            "  - connectorId: \"${5|AzureActiveDirectory,SecurityEvents,Syslog|}\"",
+            "    dataTypes:",
+            "      - \"${6|SigninLogs,SecurityEvent,Syslog|}\"",
+            "queryFrequency: \"${7|PT5M,PT1H,P1D|}\"",
+            "queryPeriod: \"${8|PT1H,P1D,P7D|}\"",
+            "triggerOperator: \"gt\"",
+            "triggerThreshold: ${9:0}",
+            "tactics:",
+            "  - \"${10|InitialAccess,Execution,Persistence|}\"",
+            "techniques:",
+            "  - \"${11:T1078}\"",
+            "tags:",
+            "  - \"${12:SecurityOps}\"",
+            "query: |",
+            "  ${13:SigninLogs}",
+            "  | where TimeGenerated >= ago(1d)",
+            "entityMappings:",
+            "  - entityType: \"${14|Account,IP,Host|}\"",
+            "    fieldMappings:",
+            "      - identifier: \"${15|FullName,Address,HostName|}\"",
+            "        columnName: \"${16:ColumnName}\"",
+            "version: \"1.0.0\"",
+            "kind: \"Scheduled\""
+        ],
+        "description": "Minimal Sentinel rule with only required fields"
+    },
+    "Entity Mapping - Account": {
+        "prefix": "entity-account",
+        "body": [
+            "- entityType: \"Account\"",
+            "  fieldMappings:",
+            "    - identifier: \"${1|FullName,Name,NTDomain,UPNSuffix,Sid,AadUserId|}\"",
+            "      columnName: \"${2:UserPrincipalName}\""
+        ],
+        "description": "Account entity mapping for Sentinel rules"
+    },
+    "Entity Mapping - IP": {
+        "prefix": "entity-ip", 
+        "body": [
+            "- entityType: \"IP\"",
+            "  fieldMappings:",
+            "    - identifier: \"Address\"",
+            "      columnName: \"${1:IPAddress}\""
+        ],
+        "description": "IP entity mapping for Sentinel rules"
+    },
+    "Entity Mapping - Host": {
+        "prefix": "entity-host",
+        "body": [
+            "- entityType: \"Host\"",
+            "  fieldMappings:",
+            "    - identifier: \"${1|HostName,FullName,NetBiosName,AzureID|}\"",
+            "      columnName: \"${2:ComputerName}\""
+        ],
+        "description": "Host entity mapping for Sentinel rules"
+    },
+    "Data Connector - Azure AD": {
+        "prefix": "connector-aad",
+        "body": [
+            "- connectorId: \"AzureActiveDirectory\"",
+            "  dataTypes:",
+            "    - \"${1|SigninLogs,AuditLogs,AADNonInteractiveUserSignInLogs|}\""
+        ],
+        "description": "Azure Active Directory data connector"
+    },
+    "Data Connector - Security Events": {
+        "prefix": "connector-security",
+        "body": [
+            "- connectorId: \"SecurityEvents\"",
+            "  dataTypes:",
+            "    - \"SecurityEvent\""
+        ],
+        "description": "Security Events data connector"
+    },
+    "Incident Configuration - Full": {
+        "prefix": "incident-config",
+        "body": [
+            "incidentConfiguration:",
+            "  createIncident: ${1|true,false|}",
+            "  groupingConfiguration:",
+            "    enabled: ${2|true,false|}",
+            "    reopenClosedIncident: ${3|false,true|}",
+            "    lookbackDuration: \"${4|PT5H,PT24H,P7D|}\"",
+            "    matchingMethod: \"${5|AllEntities,AnyAlert,Selected|}\"",
+            "    groupByEntities: [${6:\"Account\", \"IP\"}]"
+        ],
+        "description": "Complete incident configuration block"
+    },
+    "Alert Details Override": {
+        "prefix": "alert-override",
+        "body": [
+            "alertDetailsOverride:",
+            "  alertDisplayNameFormat: \"${1:Alert for {{UserPrincipalName}} from {{IPAddress}}}\"",
+            "  alertDescriptionFormat: \"${2:Detected {{EventCount}} suspicious events}\"",
+            "  alertSeverityColumnName: \"${3:DynamicSeverity}\"",
+            "  alertTacticsColumnName: \"${4:DynamicTactics}\""
+        ],
+        "description": "Dynamic alert details override configuration"
+    },
+    "MITRE Technique": {
+        "prefix": "mitre-technique",
+        "body": [
+            "\"${1|T1078,T1110,T1021,T1055,T1053,T1059,T1071,T1105,T1027,T1036|}\""
+        ],
+        "description": "Common MITRE ATT&CK technique IDs"
+    },
+    "KQL Time Filter": {
+        "prefix": "kql-time",
+        "body": [
+            "| where TimeGenerated >= ago(${1|1h,1d,7d,30d|})"
+        ],
+        "description": "KQL time filter for Sentinel rules"
+    },
+    "KQL Summarize Count": {
+        "prefix": "kql-summarize",
+        "body": [
+            "| summarize ${1:EventCount} = count() by ${2:UserPrincipalName}, ${3:IPAddress}",
+            "| where ${1:EventCount} > ${4:5}"
+        ],
+        "description": "KQL summarize with count and threshold"
+    }
+}

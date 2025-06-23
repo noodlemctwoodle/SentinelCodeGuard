@@ -1,0 +1,30 @@
+# Microsoft Sentinel Analytics Rule - Fallback Template
+
+id: "{{GUID}}"
+name: "New Detection Rule"
+description: |
+  Enter rule description here. This template was used as a fallback when the requested template could not be loaded.
+severity: "Medium"
+requiredDataConnectors:
+  - connectorId: "Enter connector ID"
+    dataTypes:
+      - "Enter data type"
+queryFrequency: "PT5M"
+queryPeriod: "PT5M"
+triggerOperator: "gt"
+triggerThreshold: 0
+tactics:
+  - "Enter MITRE ATT&CK tactic"
+query: |
+  // Enter your KQL query here
+  // Example query:
+  SecurityEvent
+  | where TimeGenerated > ago(1h)
+  | summarize count() by Computer
+entityMappings:
+  - entityType: "Host"
+    fieldMappings:
+      - identifier: "HostName"
+        columnName: "Computer"
+version: "1.0.0"
+kind: "Scheduled"

@@ -1,0 +1,52 @@
+# Microsoft Sentinel Analytics Rule - Near Real-Time Template
+
+id: "{{GUID}}"
+name: "NRT Critical Alert Detection"
+description: |
+  'Identifies critical security events requiring immediate response using Near Real-Time processing'
+severity: "High"
+requiredDataConnectors:
+  - connectorId: "SecurityEvents"
+    dataTypes:
+      - "SecurityEvent"
+queryFrequency: "PT5M"
+queryPeriod: "PT5M"
+triggerOperator: "gt"
+triggerThreshold: 0
+status: "Available"
+tactics:
+  - "PrivilegeEscalation"
+  - "Impact"
+techniques:
+  - "T1078.003"
+tags:
+  - "NRT"
+  - "Critical"
+  - "RealTime"
+query: |
+  SecurityEvent
+  | where EventID in (4728, 4732, 4756)  // Admin group modifications
+  | where TimeGenerated >= ago(5m)
+  | extend
+      GroupName = TargetUserName,
+      ModifiedBy = SubjectUserName,
+      Action = case(
+          EventID == 4728, "User Added to Global Group",
+          EventID == 4732, "User Added to Local Group", 
+          EventID == 4756, "User Added to Universal Group",
+          "Unknown Action"
+      )
+  | project TimeGenerated, Computer, ModifiedBy, GroupName, Action, EventID
+entityMappings:
+  - entityType: "Account"
+    fieldMappings:
+      - identifier: "FullName"
+        columnName: "ModifiedBy"
+  - entityType: "Host"
+    fieldMappings:
+      - identifier: "HostName"
+        columnName: "Computer"
+eventGroupingSettings:
+  aggregationKind: "SingleAlert"
+version: "1.0.0"
+kind: "NRT"

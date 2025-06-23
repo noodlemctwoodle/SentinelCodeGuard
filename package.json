@@ -1,0 +1,270 @@
+{
+  "name": "sentinelcodeguard",
+  "displayName": "SentinelCodeGuard",
+  "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates",
+  "version": "1.0.0",
+  "publisher": "noodlemctwoodle",
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.101.0"
+  },
+  "categories": [
+    "Linters",
+    "Formatters",
+    "Snippets",
+    "Language Packs"
+  ],
+  "keywords": [
+    "sentinel",
+    "microsoft",
+    "azure",
+    "security",
+    "analytics",
+    "rules",
+    "yaml",
+    "validation",
+    "kql",
+    "mitre",
+    "attack",
+    "codeguard",
+    "detection",
+    "threat-hunting"
+  ],
+  "homepage": "https://sentinel.blog",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noodlemctwoodle/sentinelcodeguard-vscode"
+  },
+  "bugs": {
+    "url": "https://github.com/noodlemctwoodle/sentinelcodeguard-vscode/issues"
+  },
+  "license": "MIT",
+  "activationEvents": [
+    "onLanguage:yaml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "sentinel-rule",
+        "aliases": [
+          "Sentinel Analytics Rule",
+          "sentinel-rule"
+        ],
+        "extensions": [
+          ".sentinel.yaml",
+          ".sentinel.yml"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "sentinel-rule",
+        "scopeName": "source.yaml.sentinel",
+        "path": "./syntaxes/sentinel-rule.tmGrammar.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "sentinel-rule",
+        "path": "./snippets/sentinel-rules.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "sentinelRules.validateRule",
+        "title": "Validate Sentinel Rule",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.fixFieldOrder",
+        "title": "Fix Field Order",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.generateTemplate",
+        "title": "Generate New Rule Template",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.generateMinimalTemplate",
+        "title": "Generate Minimal Rule Template",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.generateAdvancedTemplate",
+        "title": "Generate Advanced Rule Template",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.generateNRTTemplate",
+        "title": "Generate Near Real-Time Rule Template",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.generateBehaviorAnalyticsTemplate",
+        "title": "Generate Behavior Analytics Rule Template",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.formatRule",
+        "title": "Format Sentinel Rule",
+        "category": "Sentinel"
+      },
+      {
+        "command": "sentinelRules.validateWorkspace",
+        "title": "Validate All Sentinel Rules",
+        "category": "Sentinel"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
+          "command": "sentinelRules.validateRule",
+          "group": "sentinel@1"
+        },
+        {
+          "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
+          "command": "sentinelRules.fixFieldOrder",
+          "group": "sentinel@2"
+        },
+        {
+          "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
+          "command": "sentinelRules.formatRule",
+          "group": "sentinel@3"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "sentinelRules.generateTemplate",
+          "group": "sentinel@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "sentinelRules.validateRule",
+          "when": "resourceExtname == .yaml"
+        },
+        {
+          "command": "sentinelRules.fixFieldOrder",
+          "when": "resourceExtname == .yaml"
+        },
+        {
+          "command": "sentinelRules.generateTemplate"
+        },
+        {
+          "command": "sentinelRules.formatRule",
+          "when": "resourceExtname == .yaml"
+        },
+        {
+          "command": "sentinelRules.validateWorkspace"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "sentinelRules.validateRule",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/"
+      },
+      {
+        "command": "sentinelRules.fixFieldOrder",
+        "key": "ctrl+shift+f",
+        "mac": "cmd+shift+f",
+        "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/"
+      }
+    ],
+    "configuration": {
+      "title": "Sentinel Analytics Rules",
+      "properties": {
+        "sentinelRules.validation.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic validation of Sentinel rules"
+        },
+        "sentinelRules.validation.onSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate rules automatically on save"
+        },
+        "sentinelRules.validation.onType": {
+          "type": "boolean",
+          "default": false,
+          "description": "Validate rules as you type (may impact performance)"
+        },
+        "sentinelRules.formatting.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic formatting of Sentinel rules"
+        },
+        "sentinelRules.fieldOrdering.enforceOrder": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enforce proper field ordering in Sentinel rules"
+        },
+        "sentinelRules.fieldOrdering.showOrderHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show field ordering hints in diagnostics"
+        },
+        "sentinelRules.intellisense.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IntelliSense for Sentinel rule fields"
+        },
+        "sentinelRules.mitre.version": {
+          "type": "string",
+          "default": "v16",
+          "enum": [
+            "v16",
+            "v15",
+            "v14"
+          ],
+          "description": "MITRE ATT&CK framework version to use for validation"
+        }
+      }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "*.sentinel.yaml",
+        "url": "./schemas/sentinel-analytics-rule-schema.json"
+      },
+      {
+        "fileMatch": "*.sentinel.yml",
+        "url": "./schemas/sentinel-analytics-rule-schema.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts --fix",
+    "lint:check": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^16.18.126",
+    "@types/uuid": "^9.0.8",
+    "@types/vscode": "^1.101.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "@vscode/vsce": "^2.15.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "jsonschema": "^1.4.1",
+    "uuid": "^9.0.0"
+  }
+}
