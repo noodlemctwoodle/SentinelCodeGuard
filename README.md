@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.4-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.5-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 <p align="center">
   <strong>Professional development toolkit for Microsoft Sentinel Analytics Rules</strong>
@@ -23,7 +23,7 @@
 
 ## ⚠️ Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.4).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.5).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -198,6 +198,7 @@ kind: "Scheduled"
 | `Sentinel: Generate Advanced Rule Template` | Create comprehensive rule template | - |
 | `Sentinel: Generate NRT Rule Template` | Create near real-time rule template | - |
 | `Sentinel: Generate Behavior Analytics Template` | Create ML-based rule template | - |
+| `Sentinel: Convert ARM Template to YAML` | Convert Sentinel ARM templates to YAML format | - |
 | `Sentinel: Validate All Workspace Rules` | Validate all rules in workspace | - |
 
 ---
@@ -274,6 +275,24 @@ The extension enforces this field order for consistency:
 ---
 
 ## 📋 Changelog
+
+### v0.0.5 (2025-01-24)
+
+#### 🆕 **New Features**
+- **ARM Template to YAML Conversion**: Comprehensive conversion functionality for Microsoft Sentinel Analytics Rules
+- **Bulk Conversion Support**: Handle ARM templates containing multiple analytics rules
+- **Multiple Naming Strategies**: Choose between original filename, rule displayName, or rule ID
+- **Right-Click Context Menu**: "Convert ARM to YAML" option for .json files
+- **Command Palette Integration**: `Sentinel: Convert ARM Template to YAML` command
+- **Configuration Options**: Extensive settings under `sentinelRules.conversion.*` for customization
+
+#### 🔧 **Improvements**
+- **Field Mapping**: Complete mapping from ARM properties to YAML format with proper type conversion
+- **Validation Integration**: Auto-correct MITRE tactics/techniques during conversion
+- **Progress Indication**: User-friendly progress reporting during conversion
+- **Error Handling**: Clear validation messages and conversion summaries
+
+---
 
 ### v0.0.4 (2025-01-24)
 
