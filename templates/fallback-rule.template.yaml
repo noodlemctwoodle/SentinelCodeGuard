@@ -4,27 +4,35 @@ id: "{{GUID}}"
 name: "New Detection Rule"
 description: |
   Enter rule description here. This template was used as a fallback when the requested template could not be loaded.
+  Please update all placeholder values with appropriate content.
 severity: "Medium"
+status: "Available"
 requiredDataConnectors:
-  - connectorId: "Enter connector ID"
+  - connectorId: "AzureActiveDirectory"
     dataTypes:
-      - "Enter data type"
+      - "SigninLogs"
 queryFrequency: "PT5M"
 queryPeriod: "PT5M"
 triggerOperator: "gt"
 triggerThreshold: 0
 tactics:
-  - "Enter MITRE ATT&CK tactic"
+  - "InitialAccess"
+techniques:
+  - "T1078"
+tags:
+  - "Detection"
 query: |
   // Enter your KQL query here
-  // Example query:
-  SecurityEvent
+  // Example: Basic sign-in monitoring
+  SigninLogs
   | where TimeGenerated > ago(1h)
-  | summarize count() by Computer
+  | where ResultType != 0
+  | summarize FailedLogins = count() by UserPrincipalName
+  | where FailedLogins > 3
 entityMappings:
-  - entityType: "Host"
+  - entityType: "Account"
     fieldMappings:
-      - identifier: "HostName"
-        columnName: "Computer"
+      - identifier: "FullName"
+        columnName: "UserPrincipalName"
 version: "1.0.0"
 kind: "Scheduled"

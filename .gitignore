@@ -1,33 +1,37 @@
 # Node.js dependencies
 node_modules/
+jspm_packages/
 
 # TypeScript compilation output
 out/
 *.js.map
+*.d.ts
 
-# VS Code extension package
+# VS Code extension files
 *.vsix
-
-# Development and testing
 .vscode-test/
 .vscode-test-web/
+
+# VS Code workspace settings (but keep launch.json and tasks.json for development)
+.vscode/settings.json
+# Keep .vscode/launch.json and .vscode/tasks.json for debugging
+
+# Development and testing
 coverage/
+.nyc_output/
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+lerna-debug.log*
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
-
-# Dependency directories
-node_modules/
-jspm_packages/
 
 # Optional npm cache directory
 .npm
@@ -38,8 +42,10 @@ jspm_packages/
 # Output of 'npm pack'
 *.tgz
 
-# Yarn Integrity file
+# Yarn files
 .yarn-integrity
+.yarn/
+.pnp.*
 
 # Environment variables
 .env
@@ -48,21 +54,48 @@ jspm_packages/
 .env.test.local
 .env.production.local
 
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional TypeScript declaration maps
+*.d.ts.map
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
 # macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
+.AppleDouble
+.LSOverride
 
 # Windows
 Desktop.ini
 $RECYCLE.BIN/
+Thumbs.db
+ehthumbs.db
 
 # Linux
 *~
+.fuse_hidden*
+.directory
+.Trash-*
 
 # Temporary files
 *.tmp
@@ -79,3 +112,35 @@ $RECYCLE.BIN/
 # Build artifacts
 dist/
 build/
+lib/
+
+# Test artifacts
+test-results/
+playwright-report/
+test-results.xml
+
+# Documentation
+docs/_build/
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+
+# Local development files
+.local/
+local/

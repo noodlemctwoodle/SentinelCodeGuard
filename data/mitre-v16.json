@@ -1,0 +1,448 @@
+{
+  "version": "16.0",
+  "lastUpdated": "2025-06-23",
+  "tactics": [
+    {
+      "id": "TA0043",
+      "name": "Reconnaissance",
+      "description": "The adversary is trying to gather information they can use to plan future operations."
+    },
+    {
+      "id": "TA0042", 
+      "name": "ResourceDevelopment",
+      "description": "The adversary is trying to establish resources they can use to support operations."
+    },
+    {
+      "id": "TA0001",
+      "name": "InitialAccess", 
+      "description": "The adversary is trying to get into your network."
+    },
+    {
+      "id": "TA0002",
+      "name": "Execution",
+      "description": "The adversary is trying to run malicious code."
+    },
+    {
+      "id": "TA0003",
+      "name": "Persistence",
+      "description": "The adversary is trying to maintain their foothold."
+    },
+    {
+      "id": "TA0004", 
+      "name": "PrivilegeEscalation",
+      "description": "The adversary is trying to gain higher-level permissions."
+    },
+    {
+      "id": "TA0005",
+      "name": "DefenseEvasion", 
+      "description": "The adversary is trying to avoid being detected."
+    },
+    {
+      "id": "TA0006",
+      "name": "CredentialAccess",
+      "description": "The adversary is trying to steal account names and passwords."
+    },
+    {
+      "id": "TA0007",
+      "name": "Discovery",
+      "description": "The adversary is trying to figure out your environment."
+    },
+    {
+      "id": "TA0008",
+      "name": "LateralMovement",
+      "description": "The adversary is trying to move through your environment."
+    },
+    {
+      "id": "TA0009", 
+      "name": "Collection",
+      "description": "The adversary is trying to gather data of interest to their goal."
+    },
+    {
+      "id": "TA0011",
+      "name": "CommandAndControl", 
+      "description": "The adversary is trying to communicate with compromised systems to control them."
+    },
+    {
+      "id": "TA0010",
+      "name": "Exfiltration",
+      "description": "The adversary is trying to steal data."
+    },
+    {
+      "id": "TA0040",
+      "name": "Impact",
+      "description": "The adversary is trying to manipulate, interrupt, or destroy your systems and data."
+    }
+  ],
+  "techniques": [
+    {
+      "id": "T1595",
+      "name": "Active Scanning",
+      "tactics": ["Reconnaissance"],
+      "description": "Adversaries may execute active reconnaissance scans to gather information that can be used during targeting."
+    },
+    {
+      "id": "T1595.001",
+      "name": "Scanning IP Blocks",
+      "tactics": ["Reconnaissance"],
+      "parent": "T1595",
+      "description": "Adversaries may scan victim IP blocks to gather information that can be used during targeting."
+    },
+    {
+      "id": "T1595.002",
+      "name": "Vulnerability Scanning",
+      "tactics": ["Reconnaissance"],
+      "parent": "T1595",
+      "description": "Adversaries may scan victims for vulnerabilities that can be used during targeting."
+    },
+    {
+      "id": "T1590",
+      "name": "Gather Victim Network Information",
+      "tactics": ["Reconnaissance"],
+      "description": "Adversaries may gather information about the victim's networks that can be used during targeting."
+    },
+    {
+      "id": "T1588",
+      "name": "Obtain Capabilities",
+      "tactics": ["ResourceDevelopment"],
+      "description": "Adversaries may buy and/or steal capabilities that can be used during targeting."
+    },
+    {
+      "id": "T1588.001",
+      "name": "Malware",
+      "tactics": ["ResourceDevelopment"],
+      "parent": "T1588",
+      "description": "Adversaries may buy, steal, or download malware that can be used during targeting."
+    },
+    {
+      "id": "T1583",
+      "name": "Acquire Infrastructure",
+      "tactics": ["ResourceDevelopment"],
+      "description": "Adversaries may buy, lease, or rent infrastructure that can be used during targeting."
+    },
+    {
+      "id": "T1583.001",
+      "name": "Domains",
+      "tactics": ["ResourceDevelopment"],
+      "parent": "T1583",
+      "description": "Adversaries may acquire domains that can be used during targeting."
+    },
+    {
+      "id": "T1566",
+      "name": "Phishing",
+      "tactics": ["InitialAccess"],
+      "description": "Adversaries may send phishing messages to gain access to victim systems."
+    },
+    {
+      "id": "T1566.001",
+      "name": "Spearphishing Attachment",
+      "tactics": ["InitialAccess"],
+      "parent": "T1566",
+      "description": "Adversaries may send spearphishing emails with a malicious attachment in an attempt to gain access to victim systems."
+    },
+    {
+      "id": "T1566.002",
+      "name": "Spearphishing Link",
+      "tactics": ["InitialAccess"],
+      "parent": "T1566",
+      "description": "Adversaries may send spearphishing emails with a malicious link in an attempt to gain access to victim systems."
+    },
+    {
+      "id": "T1566.003",
+      "name": "Spearphishing via Service",
+      "tactics": ["InitialAccess"],
+      "parent": "T1566",
+      "description": "Adversaries may send spearphishing messages via third-party services in an attempt to gain access to victim systems."
+    },
+    {
+      "id": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactics": ["InitialAccess"],
+      "description": "Adversaries may attempt to take advantage of a weakness in an Internet-facing computer or program using software, data, or commands in order to cause unintended or unanticipated behavior."
+    },
+    {
+      "id": "T1133",
+      "name": "External Remote Services",
+      "tactics": ["InitialAccess", "Persistence"],
+      "description": "Adversaries may leverage external-facing remote services to initially access and/or persist within a network."
+    },
+    {
+      "id": "T1078",
+      "name": "Valid Accounts",
+      "tactics": ["InitialAccess", "Persistence", "PrivilegeEscalation", "DefenseEvasion"],
+      "description": "Adversaries may obtain and abuse credentials of existing accounts as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion."
+    },
+    {
+      "id": "T1078.001",
+      "name": "Default Accounts",
+      "tactics": ["InitialAccess", "Persistence", "PrivilegeEscalation", "DefenseEvasion"],
+      "parent": "T1078",
+      "description": "Adversaries may obtain and abuse credentials of a default account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion."
+    },
+    {
+      "id": "T1078.002",
+      "name": "Domain Accounts",
+      "tactics": ["InitialAccess", "Persistence", "PrivilegeEscalation", "DefenseEvasion"],
+      "parent": "T1078",
+      "description": "Adversaries may obtain and abuse credentials of a domain account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion."
+    },
+    {
+      "id": "T1078.003",
+      "name": "Local Accounts",
+      "tactics": ["InitialAccess", "Persistence", "PrivilegeEscalation", "DefenseEvasion"],
+      "parent": "T1078",
+      "description": "Adversaries may obtain and abuse credentials of a local account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion."
+    },
+    {
+      "id": "T1078.004",
+      "name": "Cloud Accounts",
+      "tactics": ["InitialAccess", "Persistence", "PrivilegeEscalation", "DefenseEvasion"],
+      "parent": "T1078",
+      "description": "Adversaries may obtain and abuse credentials of a cloud account as a means of gaining Initial Access, Persistence, Privilege Escalation, or Defense Evasion."
+    },
+    {
+      "id": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "tactics": ["Execution"],
+      "description": "Adversaries may abuse command and script interpreters to execute commands, scripts, or binaries."
+    },
+    {
+      "id": "T1059.001",
+      "name": "PowerShell",
+      "tactics": ["Execution"],
+      "parent": "T1059",
+      "description": "Adversaries may abuse PowerShell commands and scripts for execution."
+    },
+    {
+      "id": "T1059.003",
+      "name": "Windows Command Shell",
+      "tactics": ["Execution"],
+      "parent": "T1059",
+      "description": "Adversaries may abuse the Windows command shell for execution."
+    },
+    {
+      "id": "T1059.004",
+      "name": "Unix Shell",
+      "tactics": ["Execution"],
+      "parent": "T1059",
+      "description": "Adversaries may abuse Unix shell commands and scripts for execution."
+    },
+    {
+      "id": "T1053",
+      "name": "Scheduled Task/Job",
+      "tactics": ["Execution", "Persistence", "PrivilegeEscalation"],
+      "description": "Adversaries may abuse task scheduling functionality to facilitate initial or recurring execution of malicious code."
+    },
+    {
+      "id": "T1053.005",
+      "name": "Scheduled Task",
+      "tactics": ["Execution", "Persistence", "PrivilegeEscalation"],
+      "parent": "T1053",
+      "description": "Adversaries may abuse the Windows Task Scheduler to perform task scheduling for initial or recurring execution of malicious code."
+    },
+    {
+      "id": "T1547",
+      "name": "Boot or Logon Autostart Execution",
+      "tactics": ["Persistence", "PrivilegeEscalation"],
+      "description": "Adversaries may configure system settings to automatically execute a program during system boot or logon to maintain persistence or gain higher-level privileges on compromised systems."
+    },
+    {
+      "id": "T1547.001",
+      "name": "Registry Run Keys / Startup Folder",
+      "tactics": ["Persistence", "PrivilegeEscalation"],
+      "parent": "T1547",
+      "description": "Adversaries may achieve persistence by adding a program to a startup folder or referencing it with a Registry run key."
+    },
+    {
+      "id": "T1543",
+      "name": "Create or Modify System Process",
+      "tactics": ["Persistence", "PrivilegeEscalation"],
+      "description": "Adversaries may create or modify system-level processes to repeatedly execute malicious payloads as part of persistence."
+    },
+    {
+      "id": "T1543.003",
+      "name": "Windows Service",
+      "tactics": ["Persistence", "PrivilegeEscalation"],
+      "parent": "T1543",
+      "description": "Adversaries may create or modify Windows services to repeatedly execute malicious payloads as part of persistence."
+    },
+    {
+      "id": "T1055",
+      "name": "Process Injection",
+      "tactics": ["DefenseEvasion", "PrivilegeEscalation"],
+      "description": "Adversaries may inject code into processes in order to evade process-based defenses as well as possibly elevate privileges."
+    },
+    {
+      "id": "T1055.001",
+      "name": "Dynamic-link Library Injection",
+      "tactics": ["DefenseEvasion", "PrivilegeEscalation"],
+      "parent": "T1055",
+      "description": "Adversaries may inject dynamic-link libraries (DLLs) into processes in order to evade process-based defenses as well as possibly elevate privileges."
+    },
+    {
+      "id": "T1562",
+      "name": "Impair Defenses",
+      "tactics": ["DefenseEvasion"],
+      "description": "Adversaries may maliciously modify components of a victim's defense to avoid detection or aid in their operations."
+    },
+    {
+      "id": "T1562.001",
+      "name": "Disable or Modify Tools",
+      "tactics": ["DefenseEvasion"],
+      "parent": "T1562",
+      "description": "Adversaries may modify and/or disable security tools to avoid possible detection of their malware/tools and activities."
+    },
+    {
+      "id": "T1070",
+      "name": "Indicator Removal",
+      "tactics": ["DefenseEvasion"],
+      "description": "Adversaries may delete or modify artifacts generated within systems to remove evidence of their presence or hinder defenses."
+    },
+    {
+      "id": "T1070.001",
+      "name": "Clear Windows Event Logs",
+      "tactics": ["DefenseEvasion"],
+      "parent": "T1070",
+      "description": "Adversaries may clear Windows Event Logs to hide the activity of an intrusion."
+    },
+    {
+      "id": "T1110",
+      "name": "Brute Force",
+      "tactics": ["CredentialAccess"],
+      "description": "Adversaries may use brute force techniques to gain access to accounts when passwords are unknown or when password hashes are obtained."
+    },
+    {
+      "id": "T1110.001",
+      "name": "Password Guessing",
+      "tactics": ["CredentialAccess"],
+      "parent": "T1110",
+      "description": "Adversaries with no prior knowledge of legitimate credentials within the system or environment may guess passwords to attempt access to accounts."
+    },
+    {
+      "id": "T1003",
+      "name": "OS Credential Dumping",
+      "tactics": ["CredentialAccess"],
+      "description": "Adversaries may attempt to dump credentials to obtain account login and credential material, normally in the form of a hash or a clear text password, from the operating system and software."
+    },
+    {
+      "id": "T1003.001",
+      "name": "LSASS Memory",
+      "tactics": ["CredentialAccess"],
+      "parent": "T1003",
+      "description": "Adversaries may attempt to access credential material stored in the process memory of the Local Security Authority Subsystem Service (LSASS)."
+    },
+    {
+      "id": "T1087",
+      "name": "Account Discovery",
+      "tactics": ["Discovery"],
+      "description": "Adversaries may attempt to get a listing of accounts on a system or within an environment."
+    },
+    {
+      "id": "T1087.001",
+      "name": "Local Account",
+      "tactics": ["Discovery"],
+      "parent": "T1087",
+      "description": "Adversaries may attempt to get a listing of local system accounts."
+    },
+    {
+      "id": "T1087.002",
+      "name": "Domain Account",
+      "tactics": ["Discovery"],
+      "parent": "T1087",
+      "description": "Adversaries may attempt to get a listing of domain accounts."
+    },
+    {
+      "id": "T1083",
+      "name": "File and Directory Discovery",
+      "tactics": ["Discovery"],
+      "description": "Adversaries may enumerate files and directories or may search in specific locations of a host or network share for certain information within a file system."
+    },
+    {
+      "id": "T1135",
+      "name": "Network Share Discovery",
+      "tactics": ["Discovery"],
+      "description": "Adversaries may look for folders and drives shared on remote systems as a means of identifying sources of information to gather as a precursor for Collection and to identify potential systems of interest for Lateral Movement."
+    },
+    {
+      "id": "T1021",
+      "name": "Remote Services",
+      "tactics": ["LateralMovement"],
+      "description": "Adversaries may use Remote Services to access and persist within a network."
+    },
+    {
+      "id": "T1021.001",
+      "name": "Remote Desktop Protocol",
+      "tactics": ["LateralMovement"],
+      "parent": "T1021",
+      "description": "Adversaries may use Remote Desktop Protocol (RDP) to laterally move to a connected system."
+    },
+    {
+      "id": "T1021.002",
+      "name": "SMB/Windows Admin Shares",
+      "tactics": ["LateralMovement"],
+      "parent": "T1021",
+      "description": "Adversaries may use SMB to interact with file shares, allowing them to move laterally throughout a network."
+    },
+    {
+      "id": "T1560",
+      "name": "Archive Collected Data",
+      "tactics": ["Collection"],
+      "description": "An adversary may compress and/or encrypt data that is collected prior to exfiltration."
+    },
+    {
+      "id": "T1560.001",
+      "name": "Archive via Utility",
+      "tactics": ["Collection"],
+      "parent": "T1560",
+      "description": "Adversaries may use utilities to compress and/or encrypt collected data prior to exfiltration."
+    },
+    {
+      "id": "T1074",
+      "name": "Data Staged",
+      "tactics": ["Collection"],
+      "description": "Adversaries may stage collected data in a central location or directory prior to Exfiltration."
+    },
+    {
+      "id": "T1071",
+      "name": "Application Layer Protocol",
+      "tactics": ["CommandAndControl"],
+      "description": "Adversaries may communicate using OSI application layer protocols to avoid detection/network filtering by blending in with existing traffic."
+    },
+    {
+      "id": "T1071.001",
+      "name": "Web Protocols",
+      "tactics": ["CommandAndControl"],
+      "parent": "T1071",
+      "description": "Adversaries may communicate using application layer protocols associated with web traffic to avoid detection/network filtering by blending in with existing traffic."
+    },
+    {
+      "id": "T1041",
+      "name": "Exfiltration Over C2 Channel",
+      "tactics": ["Exfiltration"],
+      "description": "Adversaries may steal data by exfiltrating it over an existing command and control channel."
+    },
+    {
+      "id": "T1567",
+      "name": "Exfiltration Over Web Service",
+      "tactics": ["Exfiltration"],
+      "description": "Adversaries may use an existing, legitimate external Web service to exfiltrate data rather than their primary command and control channel."
+    },
+    {
+      "id": "T1486",
+      "name": "Data Encrypted for Impact",
+      "tactics": ["Impact"],
+      "description": "Adversaries may encrypt data on target systems or on large numbers of systems in a network to interrupt availability to system and network resources."
+    },
+    {
+      "id": "T1490",
+      "name": "Inhibit System Recovery",
+      "tactics": ["Impact"],
+      "description": "Adversaries may delete or remove built-in data and turn off services designed to aid in the recovery of a corrupted system to prevent recovery."
+    },
+    {
+      "id": "T1489",
+      "name": "Service Stop",
+      "tactics": ["Impact"],
+      "description": "Adversaries may stop or disable services on a system to render those services unavailable to legitimate users."
+    }
+  ]
+}

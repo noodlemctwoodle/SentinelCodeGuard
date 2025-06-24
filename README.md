@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.1-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.2-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 <p align="center">
   <strong>Professional development toolkit for Microsoft Sentinel Analytics Rules</strong>
@@ -22,7 +22,7 @@
 
 ## ⚠️ Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.1).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/sentinelcodeguard-vscode/issues).
+**SentinelCodeGuard is currently in beta (v0.0.2).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/sentinelcodeguard-vscode/issues).
 
 ---
 

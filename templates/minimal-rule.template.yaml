@@ -3,14 +3,16 @@
 id: "{{GUID}}"
 name: "New Detection Rule"
 description: |
-  'Identifies suspicious activity that requires investigation'
+  Identifies suspicious activity that requires investigation.
+  This is a minimal template with only the essential fields.
 severity: "Medium"
+status: "Available"
 requiredDataConnectors:
   - connectorId: "AzureActiveDirectory"
     dataTypes:
       - "SigninLogs"
 queryFrequency: "PT5M"
-queryPeriod: "P1D"
+queryPeriod: "PT1H"
 triggerOperator: "gt"
 triggerThreshold: 0
 tactics:
@@ -18,11 +20,13 @@ tactics:
 techniques:
   - "T1078"
 tags:
-  - "SecurityOps"
+  - "Detection"
 query: |
   SigninLogs
-  | where TimeGenerated >= ago(1d)
-  | take 10
+  | where TimeGenerated >= ago(1h)
+  | where ResultType != 0
+  | summarize FailedSignins = count() by UserPrincipalName
+  | where FailedSignins > 3
 entityMappings:
   - entityType: "Account"
     fieldMappings:

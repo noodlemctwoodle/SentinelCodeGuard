@@ -1,23 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Microsoft Sentinel Analytics Rule",
-  "description": "Schema for Microsoft Sentinel Analytics Rules",
+  "description": "Schema for Microsoft Sentinel Analytics Rules - Flexible validation",
   "type": "object",
   "required": [
-    "id",
-    "name", 
-    "description",
-    "severity",
-    "requiredDataConnectors",
-    "queryFrequency",
-    "queryPeriod",
-    "triggerOperator",
-    "triggerThreshold",
-    "tactics",
-    "query",
-    "entityMappings",
-    "version",
-    "kind"
+    "id", "name", "description", "severity", "requiredDataConnectors",
+    "queryFrequency", "queryPeriod", "triggerOperator", "triggerThreshold",
+    "tactics", "query", "entityMappings", "version", "kind"
   ],
   "properties": {
     "id": {
@@ -34,8 +23,8 @@
     "description": {
       "type": "string",
       "minLength": 1,
-      "pattern": "^(Identifies|This query searches for|Detects|Monitors).*",
-      "description": "Description of what the rule detects"
+      "maxLength": 5000,
+      "description": "Description of what the rule detects. Should be clear and informative."
     },
     "severity": {
       "type": "string",
@@ -50,27 +39,20 @@
         "properties": {
           "connectorId": {
             "type": "string",
-            "enum": [
-              "AzureActiveDirectory",
-              "SecurityEvents", 
-              "Syslog",
-              "CommonSecurityLog",
-              "AzureActivity",
-              "Office365",
-              "MicrosoftCloudAppSecurity",
-              "AzureSecurityCenter",
-              "MicrosoftThreatProtection",
-              "AzureAdvancedThreatProtection"
-            ]
+            "pattern": "^[A-Za-z][A-Za-z0-9]*$",
+            "description": "Data connector identifier"
           },
           "dataTypes": {
             "type": "array",
             "items": {
-              "type": "string"
-            }
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
           }
         }
-      }
+      },
+      "minItems": 1
     },
     "queryFrequency": {
       "type": "string",
@@ -101,22 +83,8 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": [
-          "InitialAccess",
-          "Execution", 
-          "Persistence",
-          "PrivilegeEscalation",
-          "DefenseEvasion",
-          "CredentialAccess",
-          "Discovery",
-          "LateralMovement",
-          "Collection",
-          "CommandAndControl",
-          "Exfiltration",
-          "Impact",
-          "ResourceDevelopment",
-          "Reconnaissance"
-        ]
+        "pattern": "^[A-Z][a-zA-Z]{2,30}$",
+        "description": "MITRE ATT&CK tactic name (e.g., InitialAccess, Persistence)"
       },
       "minItems": 1
     },
@@ -153,20 +121,8 @@
         "properties": {
           "entityType": {
             "type": "string",
-            "enum": [
-              "Account",
-              "IP",
-              "Host", 
-              "File",
-              "Process",
-              "URL",
-              "DNS",
-              "FileHash",
-              "AzureResource",
-              "MailboxConfiguration",
-              "MailMessage",
-              "SubmissionMail"
-            ]
+            "pattern": "^[A-Z][a-zA-Z0-9]*$",
+            "description": "Sentinel entity type (e.g., Account, IP, Host)"
           },
           "fieldMappings": {
             "type": "array",
@@ -181,7 +137,8 @@
                   "type": "string"
                 }
               }
-            }
+            },
+            "minItems": 1
           }
         }
       },
@@ -266,8 +223,11 @@
     },
     "kind": {
       "type": "string",
-      "enum": ["Scheduled", "NRT", "MicrosoftSecurityIncidentCreation"],
-      "description": "Type of analytics rule"
+      "enum": [
+        "Scheduled", 
+        "NRT"
+      ],
+      "description": "Type of analytics rule that can be created by users"
     }
   },
   "additionalProperties": false

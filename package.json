@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -75,67 +75,57 @@
     ],
     "commands": [
       {
-        "command": "sentinelRules.validateRule",
-        "title": "Validate Sentinel Rule",
-        "category": "Sentinel"
-      },
-      {
         "command": "sentinelRules.fixFieldOrder",
         "title": "Fix Field Order",
-        "category": "Sentinel"
+        "category": "Sentinel Rules"
+      },
+      {
+        "command": "sentinelRules.formatRule", 
+        "title": "Format Sentinel Rule",
+        "category": "Sentinel Rules"
       },
       {
         "command": "sentinelRules.generateTemplate",
-        "title": "Generate New Rule Template",
-        "category": "Sentinel"
-      },
-      {
-        "command": "sentinelRules.generateMinimalTemplate",
-        "title": "Generate Minimal Rule Template",
-        "category": "Sentinel"
+        "title": "Generate Standard Rule Template",
+        "category": "Sentinel Rules"
       },
       {
         "command": "sentinelRules.generateAdvancedTemplate",
-        "title": "Generate Advanced Rule Template",
-        "category": "Sentinel"
+        "title": "Generate Advanced Rule Template", 
+        "category": "Sentinel Rules"
       },
       {
         "command": "sentinelRules.generateNRTTemplate",
-        "title": "Generate Near Real-Time Rule Template",
-        "category": "Sentinel"
+        "title": "Generate NRT Rule Template",
+        "category": "Sentinel Rules"
       },
       {
         "command": "sentinelRules.generateBehaviorAnalyticsTemplate",
         "title": "Generate Behavior Analytics Rule Template",
-        "category": "Sentinel"
+        "category": "Sentinel Rules"
       },
       {
-        "command": "sentinelRules.formatRule",
-        "title": "Format Sentinel Rule",
-        "category": "Sentinel"
+        "command": "sentinelRules.generateMinimalTemplate",
+        "title": "Generate Minimal Rule Template",
+        "category": "Sentinel Rules"
       },
       {
         "command": "sentinelRules.validateWorkspace",
-        "title": "Validate All Sentinel Rules",
-        "category": "Sentinel"
+        "title": "Validate All Workspace Rules",
+        "category": "Sentinel Rules"
       }
     ],
     "menus": {
       "editor/context": [
         {
           "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
-          "command": "sentinelRules.validateRule",
+          "command": "sentinelRules.fixFieldOrder",
           "group": "sentinel@1"
         },
         {
           "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
-          "command": "sentinelRules.fixFieldOrder",
-          "group": "sentinel@2"
-        },
-        {
-          "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
           "command": "sentinelRules.formatRule",
-          "group": "sentinel@3"
+          "group": "sentinel@2"
         }
       ],
       "explorer/context": [
@@ -146,10 +136,6 @@
         }
       ],
       "commandPalette": [
-        {
-          "command": "sentinelRules.validateRule",
-          "when": "resourceExtname == .yaml"
-        },
         {
           "command": "sentinelRules.fixFieldOrder",
           "when": "resourceExtname == .yaml"
@@ -167,12 +153,6 @@
       ]
     },
     "keybindings": [
-      {
-        "command": "sentinelRules.validateRule",
-        "key": "ctrl+shift+v",
-        "mac": "cmd+shift+v",
-        "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/"
-      },
       {
         "command": "sentinelRules.fixFieldOrder",
         "key": "ctrl+shift+f",
@@ -227,6 +207,44 @@
             "v14"
           ],
           "description": "MITRE ATT&CK framework version to use for validation"
+        },
+        "sentinelRules.connectors.validationMode": {
+          "type": "string",
+          "enum": [
+            "strict",
+            "workspace",
+            "permissive"
+          ],
+          "default": "permissive",
+          "enumDescriptions": [
+            "Only allow known connectors from extension database",
+            "Allow connectors defined in workspace .sentinel-connectors.json",
+            "Allow any valid connector ID format (recommended)"
+          ],
+          "description": "How strictly to validate connector IDs"
+        },
+        "sentinelRules.connectors.customConnectors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Additional custom connector IDs to recognize"
+        },
+        "sentinelRules.mitre.allowUnknownTactics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow tactics not found in loaded MITRE data (shows info message only)"
+        },
+        "sentinelRules.mitre.allowUnknownTechniques": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow techniques not found in loaded MITRE data (shows info message only)"
+        },
+        "sentinelRules.mitre.strictValidation": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require all tactics/techniques to be in loaded MITRE data (shows errors for unknown items)"
         }
       }
     },
@@ -268,5 +286,17 @@
     "js-yaml": "^4.1.0",
     "jsonschema": "^1.4.1",
     "uuid": "^9.0.0"
-  }
+  },
+  "files": [
+    "out/**",
+    "images/**", 
+    "templates/**",
+    "schemas/**",
+    "snippets/**",
+    "syntaxes/**",
+    "data/**",
+    "language-configuration.json",
+    "README.md",
+    "LICENSE.txt"
+  ]
 }
