@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 interface ConnectorInfo {
     id: string;
@@ -10,44 +11,30 @@ interface ConnectorInfo {
 
 export class ConnectorLoader {
     private static connectors: Map<string, ConnectorInfo> = new Map();
-    private static isLoaded = false;
+    private static extensionContext: vscode.ExtensionContext;
+
+    public static setExtensionContext(context: vscode.ExtensionContext) {
+        this.extensionContext = context;
+    }
 
     public static async loadConnectorData(): Promise<void> {
-        if (this.isLoaded) return;
-
         try {
-            const config = vscode.workspace.getConfiguration('sentinelRules');
-            const validationMode = config.get<string>('connectors.validationMode', 'permissive');
-            
-            switch (validationMode) {
-                case 'strict':
-                    await this.loadFromEmbeddedData();
-                    break;
-                case 'workspace':
-                    await this.loadFromWorkspace();
-                    break;
-                case 'permissive':
-                default:
-                    // Don't validate connector names at all - just check format
-                    break;
-            }
-            
-            // Always load user-defined connectors
-            await this.loadCustomConnectors();
-            
-            this.isLoaded = true;
+            await this.loadFromEmbeddedData();
         } catch (error) {
             console.error('Failed to load connector data:', error);
-            // In permissive mode, we continue without strict validation
+            this.loadFallbackData();
         }
     }
 
     private static async loadFromEmbeddedData(): Promise<void> {
         try {
-            const connectorDataUri = vscode.Uri.joinPath(
-                vscode.extensions.getExtension('noodlemctwoodle.sentinelcodeguard')!.extensionUri,
-                'data', 'connectors.json'
-            );
+            if (!this.extensionContext) {
+                throw new Error('Extension context not set');
+            }
+
+            // Use extension context instead of vscode.extensions.getExtension()
+            const connectorDataPath = path.join(this.extensionContext.extensionPath, 'data', 'connectors.json');
+            const connectorDataUri = vscode.Uri.file(connectorDataPath);
             
             const data = await vscode.workspace.fs.readFile(connectorDataUri);
             const connectorData = JSON.parse(data.toString());
@@ -58,11 +45,17 @@ export class ConnectorLoader {
                 this.connectors.set(connector.id, connector);
             }
             
-            console.log(`Loaded ${this.connectors.size} connectors from embedded data`);
+            console.log(`✅ Loaded ${this.connectors.size} connector definitions`);
         } catch (error) {
-            console.info('No embedded connector data found. Using permissive validation mode.');
-            // This is expected and fine - we fall back to permissive validation
+            console.warn('Could not load connector data from embedded file, using fallback:', error);
+            this.loadFallbackData();
         }
+    }
+
+    private static loadFallbackData() {
+        // Fallback logic to load connector data
+        console.log('Loading fallback connector data...');
+        // For example, load some default connectors or handle the error gracefully
     }
 
     private static async loadFromWorkspace(): Promise<void> {

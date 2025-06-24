@@ -404,7 +404,7 @@ export class SentinelRuleValidator {
             // If we have enough indicators, it's likely a Sentinel rule
             return indicatorCount >= MIN_SENTINEL_INDICATORS;
 
-        } catch (error) {
+        } catch {
             // If YAML parsing fails, not a valid rule anyway
             return false;
         }

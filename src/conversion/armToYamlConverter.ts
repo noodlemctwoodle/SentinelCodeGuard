@@ -441,12 +441,29 @@ export class ArmToYamlConverter {
             return '// Enter your KQL query here\n// Replace this with your actual query';
         }
         
+        // Convert escape sequences to actual line breaks
+        const formattedQuery = query
+            .replace(/\\r\\n/g, '\n')  // Convert \r\n to actual line breaks
+            .replace(/\\n/g, '\n')     // Convert \n to actual line breaks
+            .replace(/\\r/g, '\n')     // Convert \r to actual line breaks
+            .replace(/\\t/g, '    ')   // Convert \t to 4 spaces
+            .trim();
+    
         if (preserveFormatting) {
-            return query.trim();
+            // Clean up formatting while preserving structure
+            return formattedQuery
+                .split('\n')
+                .map(line => line.trim())
+                .join('\n')
+                .replace(/\n{3,}/g, '\n\n'); // Limit consecutive empty lines
         }
         
         // Basic query formatting
-        return query.trim().replace(/\s+/g, ' ');
+        return formattedQuery
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .join('\n');
     }
 
     private static normalizeKind(kind: string): string {

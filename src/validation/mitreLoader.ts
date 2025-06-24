@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 interface MitreTechnique {
     id: string;
@@ -9,6 +10,11 @@ interface MitreTechnique {
 export class MitreLoader {
     private static techniques: Map<string, MitreTechnique> = new Map();
     private static tactics: Set<string> = new Set();
+    private static extensionContext: vscode.ExtensionContext;
+
+    public static setExtensionContext(context: vscode.ExtensionContext) {
+        this.extensionContext = context;
+    }
 
     public static async loadMitreData(): Promise<void> {
         try {
@@ -16,7 +22,7 @@ export class MitreLoader {
             const config = vscode.workspace.getConfiguration('sentinelRules');
             const mitreVersion = config.get('mitre.version', 'v16');
             
-            // You could load from embedded JSON file or API
+            // Load from embedded JSON file
             await this.loadFromEmbeddedData(mitreVersion);
         } catch (error) {
             console.error('Failed to load MITRE data:', error);
@@ -26,12 +32,14 @@ export class MitreLoader {
     }
 
     private static async loadFromEmbeddedData(version: string): Promise<void> {
-        // Load from a JSON file in your extension
         try {
-            const mitreDataUri = vscode.Uri.joinPath(
-                vscode.extensions.getExtension('noodlemctwoodle.sentinelcodeguard')!.extensionUri,
-                'data', `mitre-${version}.json`
-            );
+            if (!this.extensionContext) {
+                throw new Error('Extension context not set');
+            }
+
+            // Use extension context instead of vscode.extensions.getExtension()
+            const mitreDataPath = path.join(this.extensionContext.extensionPath, 'data', `mitre-${version}.json`);
+            const mitreDataUri = vscode.Uri.file(mitreDataPath);
             
             const data = await vscode.workspace.fs.readFile(mitreDataUri);
             const mitreData = JSON.parse(data.toString());
@@ -43,7 +51,10 @@ export class MitreLoader {
                 this.techniques.set(technique.id, technique);
                 technique.tactics.forEach((tactic: string) => this.tactics.add(tactic));
             }
-        } catch {
+            
+            console.log(`✅ Loaded ${this.techniques.size} MITRE techniques and ${this.tactics.size} tactics`);
+        } catch (error) {
+            console.warn('Could not load MITRE data from embedded file, using fallback:', error);
             this.loadFallbackData();
         }
     }

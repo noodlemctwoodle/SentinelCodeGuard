@@ -7,56 +7,86 @@ import { DocumentListenerManager } from './listeners/documentListeners';
 import { MitreLoader } from './validation/mitreLoader';
 import { ConnectorLoader } from './validation/connectorLoader';
 
-export async function activate(context: vscode.ExtensionContext) {
-    console.log('🚀 SentinelCodeGuard: Starting activation...');
-
-    // Initialize loaders
-    try {
-        await MitreLoader.loadMitreData();
-        await ConnectorLoader.loadConnectorData();
-        console.log('✅ SentinelCodeGuard: Data loaders initialized');
-    } catch (error) {
-        console.error('❌ SentinelCodeGuard: Failed to initialize validation loaders:', error);
-        // Extension will continue with basic validation
+function getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+        return error.message;
     }
+    return String(error);
+}
 
-    // Create core components
-    const validator = new SentinelRuleValidator();
-    const commandManager = new CommandManager(context, validator);
-    const documentListenerManager = new DocumentListenerManager(validator);
+function getErrorStack(error: unknown): string | undefined {
+    if (error instanceof Error) {
+        return error.stack;
+    }
+    return undefined;
+}
 
-    // Set the extension context for the formatter (needed for template loading)
-    SentinelRuleFormatter.setExtensionContext(context);
+export async function activate(context: vscode.ExtensionContext) {
+    try {
+        console.log('🚀 SentinelCodeGuard: Starting activation...');
 
-    // Register all components
-    console.log('🔧 SentinelCodeGuard: Registering components...');
-    
-    const documentListeners = documentListenerManager.registerListeners();
-    console.log(`📄 SentinelCodeGuard: Registered ${documentListeners.length} document listeners`);
-    
-    const commands = commandManager.registerCommands();
-    console.log(`⚡ SentinelCodeGuard: Registered ${commands.length} commands`);
-    
-    const formatterProvider = createFormattingProvider();
-    console.log('🎨 SentinelCodeGuard: Registered formatting provider');
+        // Set extension context for all components that need it
+        SentinelRuleFormatter.setExtensionContext(context);
+        MitreLoader.setExtensionContext(context);
+        ConnectorLoader.setExtensionContext(context);
 
-    // Add all disposables to context subscriptions
-    context.subscriptions.push(
-        validator,
-        ...documentListeners,
-        ...commands,
-        formatterProvider
-    );
+        // Initialize loaders
+        try {
+            await MitreLoader.loadMitreData();
+            await ConnectorLoader.loadConnectorData();
+            console.log('✅ SentinelCodeGuard: Data loaders initialized');
+        } catch (loaderError) {
+            console.error('❌ SentinelCodeGuard: Failed to initialize validation loaders:', getErrorMessage(loaderError));
+            // Extension will continue with basic validation
+        }
 
-    // Validate open documents on activation
-    documentListenerManager.validateOpenDocuments();
+        // Create core components
+        const validator = new SentinelRuleValidator();
+        const commandManager = new CommandManager(context, validator);
+        const documentListenerManager = new DocumentListenerManager(validator);
 
-    console.log('✅ SentinelCodeGuard: Extension activation complete!');
-    
-    // Test command registration
-    const allCommands = await vscode.commands.getCommands(true);
-    const sentinelCommands = allCommands.filter(cmd => cmd.startsWith('sentinelRules.'));
-    console.log('🔍 SentinelCodeGuard: Available commands:', sentinelCommands);
+        // Register all components
+        console.log('🔧 SentinelCodeGuard: Registering components...');
+        
+        const documentListeners = documentListenerManager.registerListeners();
+        console.log(`📄 SentinelCodeGuard: Registered ${documentListeners.length} document listeners`);
+        
+        const commands = commandManager.registerCommands();
+        console.log(`⚡ SentinelCodeGuard: Registered ${commands.length} commands`);
+        
+        const formatterProvider = createFormattingProvider();
+        console.log('🎨 SentinelCodeGuard: Registered formatting provider');
+
+        // Add all disposables to context subscriptions
+        context.subscriptions.push(
+            validator,
+            ...documentListeners,
+            ...commands,
+            formatterProvider
+        );
+
+        // Validate open documents on activation
+        documentListenerManager.validateOpenDocuments();
+
+        console.log('✅ SentinelCodeGuard: Extension activation complete!');
+        
+        // Test command registration
+        const allCommands = await vscode.commands.getCommands(true);
+        const sentinelCommands = allCommands.filter((cmd: string) => cmd.startsWith('sentinelRules.'));
+        console.log('🔍 SentinelCodeGuard: Available commands:', sentinelCommands);
+        
+    } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        const errorStack = getErrorStack(error);
+        
+        console.error('❌ SentinelCodeGuard: Extension activation failed:', errorMessage);
+        if (errorStack) {
+            console.error('Stack trace:', errorStack);
+        }
+        
+        vscode.window.showErrorMessage(`SentinelCodeGuard activation failed: ${errorMessage}`);
+        throw error;
+    }
 }
 
 export function deactivate() {

@@ -42,7 +42,8 @@
   },
   "license": "MIT",
   "activationEvents": [
-    "onLanguage:yaml"
+    "onLanguage:yaml",
+    "onLanguage:sentinel-rule"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -80,7 +81,7 @@
         "category": "Sentinel Rules"
       },
       {
-        "command": "sentinelRules.formatRule", 
+        "command": "sentinelRules.formatRule",
         "title": "Format Sentinel Rule",
         "category": "Sentinel Rules"
       },
@@ -91,7 +92,7 @@
       },
       {
         "command": "sentinelRules.generateAdvancedTemplate",
-        "title": "Generate Advanced Rule Template", 
+        "title": "Generate Advanced Rule Template",
         "category": "Sentinel Rules"
       },
       {
@@ -268,13 +269,13 @@
           "type": "string",
           "enum": [
             "original",
-            "displayName", 
+            "displayName",
             "ruleId"
           ],
           "default": "displayName",
           "enumDescriptions": [
             "Use original filename with .yaml extension",
-            "Use rule's displayName property as filename", 
+            "Use rule's displayName property as filename",
             "Use rule's unique identifier as filename"
           ],
           "description": "Default strategy for naming converted YAML files"
@@ -353,16 +354,17 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
+    "@eslint/js": "^9.29.0",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^16.18.126",
     "@types/uuid": "^9.0.8",
     "@types/vscode": "^1.101.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
     "@vscode/test-electron": "^2.2.0",
-    "@vscode/vsce": "^2.15.0",
-    "eslint": "^8.28.0",
-    "typescript": "^4.9.4"
+    "@vscode/vsce": "^3.5.0",
+    "eslint": "^9.29.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
@@ -371,7 +373,7 @@
   },
   "files": [
     "out/**",
-    "images/**", 
+    "images/**",
     "templates/**",
     "schemas/**",
     "snippets/**",
@@ -379,6 +381,10 @@
     "data/**",
     "language-configuration.json",
     "README.md",
-    "LICENSE.txt"
+    "LICENSE.txt",
+    "node_modules/js-yaml/**",
+    "node_modules/jsonschema/**",
+    "node_modules/uuid/**",
+    "node_modules/argparse/**"
   ]
 }
