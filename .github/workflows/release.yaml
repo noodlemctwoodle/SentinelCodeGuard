@@ -1,0 +1,191 @@
+name: Automated Release
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'package.json'  # Only trigger when package.json changes
+
+jobs:
+  check-release:
+    runs-on: ubuntu-latest
+    outputs:
+      should-release: ${{ steps.check.outputs.should-release }}
+      version: ${{ steps.check.outputs.version }}
+      is-beta: ${{ steps.check.outputs.is-beta }}
+      tag-name: ${{ steps.check.outputs.tag-name }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit to compare
+          
+      - name: Check version and release conditions
+        id: check
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Check if this is a beta version - multiple detection methods
+          IS_BETA="false"
+          
+          # Method 1: Check commit message for [beta] flag
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          if [[ "$COMMIT_MSG" == *"[beta]"* ]] || [[ "$COMMIT_MSG" == *"beta"* ]]; then
+            IS_BETA="true"
+            echo "Beta detected from commit message"
+          fi
+          
+          # Method 2: Check if displayName in package.json contains "Beta"
+          DISPLAY_NAME=$(node -p "require('./package.json').displayName || ''")
+          echo "Display name: $DISPLAY_NAME"
+          if [[ "$DISPLAY_NAME" == *"Beta"* ]]; then
+            IS_BETA="true"
+            echo "Beta detected from displayName"
+          fi
+          
+          # Set tag name
+          if [ "$IS_BETA" = "true" ]; then
+            TAG_NAME="v${CURRENT_VERSION}-beta"
+          else
+            TAG_NAME="v${CURRENT_VERSION}"
+          fi
+          
+          echo "Is Beta: $IS_BETA"
+          echo "Tag Name: $TAG_NAME"
+          
+          # Check if version changed compared to previous commit
+          if git show HEAD~1:package.json &>/dev/null; then
+            PREVIOUS_VERSION=$(git show HEAD~1:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).version")
+            echo "Previous version: $PREVIOUS_VERSION"
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              SHOULD_RELEASE="true"
+              echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION - will create release"
+            else
+              SHOULD_RELEASE="false"
+              echo "Version unchanged - no release needed"
+            fi
+          else
+            # First commit or package.json didn't exist before
+            SHOULD_RELEASE="true"
+            echo "Initial version $CURRENT_VERSION - will create release"
+          fi
+          
+          # Check if tag already exists
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Tag $TAG_NAME already exists - skipping release"
+            SHOULD_RELEASE="false"
+          fi
+          
+          # Set outputs
+          echo "should-release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "is-beta=$IS_BETA" >> $GITHUB_OUTPUT
+          echo "tag-name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+  release:
+    needs: check-release
+    if: needs.check-release.outputs.should-release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Required for creating releases and tags
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Lint and compile
+        run: |
+          npm run lint:check
+          npm run compile
+          
+      - name: Package extension
+        run: npm run package
+        
+      - name: Create Git tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag ${{ needs.check-release.outputs.tag-name }}
+          git push origin ${{ needs.check-release.outputs.tag-name }}
+          
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          VERSION="${{ needs.check-release.outputs.version }}"
+          IS_BETA="${{ needs.check-release.outputs.is-beta }}"
+          
+          if [ "$IS_BETA" = "true" ]; then
+            RELEASE_TYPE="🧪 Beta Release"
+            STABILITY_NOTE="⚠️ **This is a beta release** - Please report any issues via [GitHub Issues](https://github.com/${{ github.repository }}/issues)."
+          else
+            RELEASE_TYPE="🚀 Stable Release"
+            STABILITY_NOTE="✅ **Stable release** - Ready for production use."
+          fi
+          
+          cat > release_notes.md << EOF
+          # SentinelCodeGuard v${VERSION}
+          
+          ${STABILITY_NOTE}
+          
+          ## 📦 Installation
+          
+          ### From VS Code Marketplace
+          1. Open VS Code Extensions (Ctrl+Shift+X)
+          2. Search for "SentinelCodeGuard"
+          3. Click Install
+          
+          ### Manual Installation
+          1. Download the \`.vsix\` file below
+          2. In VS Code: Extensions → "..." → "Install from VSIX"
+          3. Select the downloaded file
+          
+          ## 🔗 Resources
+          - [Documentation](https://github.com/${{ github.repository }}#readme)
+          - [Report Issues](https://github.com/${{ github.repository }}/issues)
+          - [Sentinel Blog](https://sentinel.blog)
+          
+          ## 📋 What's Included
+          - ✅ Content-based Sentinel rule detection
+          - ✅ Real-time validation with MITRE ATT&CK v16
+          - ✅ Professional formatting and field ordering
+          - ✅ Comprehensive rule templates
+          - ✅ Configurable connector validation
+          EOF
+          
+          echo "release-notes-file=release_notes.md" >> $GITHUB_OUTPUT
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.check-release.outputs.tag-name }}
+          name: "SentinelCodeGuard v${{ needs.check-release.outputs.version }}"
+          body_path: ${{ steps.release-notes.outputs.release-notes-file }}
+          draft: false
+          prerelease: ${{ needs.check-release.outputs.is-beta == 'true' }}
+          generate_release_notes: true  # This adds automatic changelog
+          files: |
+            sentinelcodeguard-*.vsix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Release Summary
+        run: |
+          echo "🎉 Successfully created release v${{ needs.check-release.outputs.version }}"
+          echo "🏷️ Tag: ${{ needs.check-release.outputs.tag-name }}"
+          echo "🧪 Beta: ${{ needs.check-release.outputs.is-beta }}"
+          echo "📦 VSIX: sentinelcodeguard-${{ needs.check-release.outputs.version }}.vsix"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.check-release.outputs.tag-name }}"
