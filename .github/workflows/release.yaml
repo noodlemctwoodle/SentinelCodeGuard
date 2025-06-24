@@ -5,10 +5,15 @@ on:
     branches: [ main ]
     paths:
       - 'package.json'  # Only trigger when package.json changes
-  workflow_dispatch:  # Add manual trigger
+  workflow_dispatch:  # Manual trigger
     inputs:
       force_release:
         description: 'Force create release for current version'
+        required: false
+        type: boolean
+        default: true
+      overwrite_existing:
+        description: 'Overwrite existing release if it exists'
         required: false
         type: boolean
         default: true
@@ -21,6 +26,7 @@ jobs:
       version: ${{ steps.check.outputs.version }}
       is-beta: ${{ steps.check.outputs.is-beta }}
       tag-name: ${{ steps.check.outputs.tag-name }}
+      is-manual-trigger: ${{ steps.check.outputs.is-manual-trigger }}
       
     steps:
       - name: Checkout code
@@ -34,6 +40,13 @@ jobs:
           # Get current version from package.json
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           echo "Current version: $CURRENT_VERSION"
+          
+          # Check if this is a manual trigger
+          IS_MANUAL_TRIGGER="false"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            IS_MANUAL_TRIGGER="true"
+            echo "Manual trigger detected"
+          fi
           
           # Check if this is a beta version - multiple detection methods
           IS_BETA="false"
@@ -63,23 +76,45 @@ jobs:
           
           echo "Is Beta: $IS_BETA"
           echo "Tag Name: $TAG_NAME"
+          echo "Is Manual Trigger: $IS_MANUAL_TRIGGER"
           
           # Initialize SHOULD_RELEASE
           SHOULD_RELEASE="false"
           
           # Check for manual trigger first
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_release }}" = "true" ]; then
+          if [ "$IS_MANUAL_TRIGGER" = "true" ] && [ "${{ github.event.inputs.force_release }}" = "true" ]; then
             SHOULD_RELEASE="true"
-            echo "Manual release triggered - forcing release creation"
+            echo "✅ Manual release triggered - forcing release creation"
+            
+            # Check if overwrite is enabled and tag exists
+            if [ "${{ github.event.inputs.overwrite_existing }}" = "true" ]; then
+              if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+                echo "🔄 Tag $TAG_NAME exists and overwrite is enabled - will recreate"
+              else
+                echo "🆕 Tag $TAG_NAME doesn't exist - will create new"
+              fi
+            else
+              # Check if tag exists and fail if overwrite is not enabled
+              if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+                echo "❌ Tag $TAG_NAME already exists and overwrite is disabled"
+                SHOULD_RELEASE="false"
+              fi
+            fi
           else
-            # Check if version changed compared to previous commit
+            # Automatic trigger - check if version changed compared to previous commit
             if git show HEAD~1:package.json &>/dev/null; then
               PREVIOUS_VERSION=$(git show HEAD~1:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).version")
               echo "Previous version: $PREVIOUS_VERSION"
               
               if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-                SHOULD_RELEASE="true"
-                echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION - will create release"
+                # Check if tag already exists for automatic releases
+                if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+                  echo "❌ Tag $TAG_NAME already exists - skipping automatic release (use manual trigger to overwrite)"
+                  SHOULD_RELEASE="false"
+                else
+                  SHOULD_RELEASE="true"
+                  echo "✅ Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION - will create release"
+                fi
               else
                 SHOULD_RELEASE="false"
                 echo "Version unchanged - no release needed"
@@ -87,18 +122,7 @@ jobs:
             else
               # First commit or package.json didn't exist before
               SHOULD_RELEASE="true"
-              echo "Initial version $CURRENT_VERSION - will create release"
-            fi
-          fi
-          
-          # Check if tag already exists (but allow override for manual trigger)
-          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-              echo "Tag $TAG_NAME already exists but manual trigger will recreate release"
-              # Keep SHOULD_RELEASE as true for manual trigger
-            else
-              echo "Tag $TAG_NAME already exists - skipping release"
-              SHOULD_RELEASE="false"
+              echo "✅ Initial version $CURRENT_VERSION - will create release"
             fi
           fi
           
@@ -107,6 +131,7 @@ jobs:
           echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "is-beta=$IS_BETA" >> $GITHUB_OUTPUT
           echo "tag-name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "is-manual-trigger=$IS_MANUAL_TRIGGER" >> $GITHUB_OUTPUT
 
   release:
     needs: check-release
@@ -136,27 +161,53 @@ jobs:
       - name: Package extension
         run: npm run package
         
-      - name: Create or update Git tag
+      - name: Delete existing release and tag (if manual trigger with overwrite)
+        if: needs.check-release.outputs.is-manual-trigger == 'true' && github.event.inputs.overwrite_existing == 'true'
+        run: |
+          TAG_NAME="${{ needs.check-release.outputs.tag-name }}"
+          
+          echo "🔄 Manual trigger with overwrite enabled - cleaning up existing release"
+          
+          # Delete existing release if it exists
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "🗑️ Deleting existing release $TAG_NAME"
+            gh release delete "$TAG_NAME" --yes --cleanup-tag
+          else
+            echo "ℹ️ No existing release found for $TAG_NAME"
+          fi
+          
+          # Delete existing tag if it exists (both locally and remotely)
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "🗑️ Deleting existing tag $TAG_NAME"
+            git tag -d "$TAG_NAME" 2>/dev/null || true
+            git push origin --delete "$TAG_NAME" 2>/dev/null || true
+          else
+            echo "ℹ️ No existing tag found for $TAG_NAME"
+          fi
+          
+          # Wait a moment to ensure GitHub processes the deletion
+          sleep 3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Create Git tag
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           
-          # Delete tag if it exists (for manual triggers)
-          if git rev-parse "${{ needs.check-release.outputs.tag-name }}" >/dev/null 2>&1; then
-            echo "Deleting existing tag ${{ needs.check-release.outputs.tag-name }}"
-            git tag -d "${{ needs.check-release.outputs.tag-name }}" || true
-            git push origin --delete "${{ needs.check-release.outputs.tag-name }}" || true
-          fi
+          TAG_NAME="${{ needs.check-release.outputs.tag-name }}"
           
           # Create new tag
-          git tag ${{ needs.check-release.outputs.tag-name }}
-          git push origin ${{ needs.check-release.outputs.tag-name }}
+          echo "🏷️ Creating tag $TAG_NAME"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
           
       - name: Generate release notes
         id: release-notes
         run: |
           VERSION="${{ needs.check-release.outputs.version }}"
           IS_BETA="${{ needs.check-release.outputs.is-beta }}"
+          IS_MANUAL="${{ needs.check-release.outputs.is-manual-trigger }}"
           
           if [ "$IS_BETA" = "true" ]; then
             RELEASE_TYPE="🧪 Beta Release"
@@ -166,10 +217,22 @@ jobs:
             STABILITY_NOTE="✅ **Stable release** - Ready for production use."
           fi
           
+          # Add manual trigger notice if applicable
+          MANUAL_NOTICE=""
+          if [ "$IS_MANUAL" = "true" ]; then
+            if [ "${{ github.event.inputs.overwrite_existing }}" = "true" ]; then
+              MANUAL_NOTICE="🔄 **This release was manually triggered and overwrote an existing release.**"
+            else
+              MANUAL_NOTICE="⚡ **This release was manually triggered.**"
+            fi
+          fi
+          
           cat > release_notes.md << EOF
           # SentinelCodeGuard v${VERSION}
           
           ${STABILITY_NOTE}
+          
+          ${MANUAL_NOTICE}
           
           ## 📦 Installation
           
@@ -194,22 +257,15 @@ jobs:
           - ✅ Professional formatting and field ordering
           - ✅ Comprehensive rule templates
           - ✅ Configurable connector validation
+          
+          ---
+          *Built with ❤️ for the Microsoft Sentinel community*
           EOF
           
           echo "release-notes-file=release_notes.md" >> $GITHUB_OUTPUT
           
-      - name: Delete existing release if it exists
-        run: |
-          # Delete existing release if it exists (for manual re-runs)
-          if gh release view "${{ needs.check-release.outputs.tag-name }}" >/dev/null 2>&1; then
-            echo "Deleting existing release ${{ needs.check-release.outputs.tag-name }}"
-            gh release delete "${{ needs.check-release.outputs.tag-name }}" --yes || true
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.check-release.outputs.tag-name }}
           name: "SentinelCodeGuard v${{ needs.check-release.outputs.version }}"
@@ -217,6 +273,7 @@ jobs:
           draft: false
           prerelease: ${{ needs.check-release.outputs.is-beta == 'true' }}
           generate_release_notes: true  # This adds automatic changelog
+          make_latest: ${{ needs.check-release.outputs.is-beta == 'false' }}
           files: |
             sentinelcodeguard-*.vsix
         env:
@@ -227,5 +284,10 @@ jobs:
           echo "🎉 Successfully created release v${{ needs.check-release.outputs.version }}"
           echo "🏷️ Tag: ${{ needs.check-release.outputs.tag-name }}"
           echo "🧪 Beta: ${{ needs.check-release.outputs.is-beta }}"
+          echo "⚡ Manual: ${{ needs.check-release.outputs.is-manual-trigger }}"
           echo "📦 VSIX: sentinelcodeguard-${{ needs.check-release.outputs.version }}.vsix"
           echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.check-release.outputs.tag-name }}"
+          
+          if [ "${{ needs.check-release.outputs.is-manual-trigger }}" = "true" ] && [ "${{ github.event.inputs.overwrite_existing }}" = "true" ]; then
+            echo "🔄 This was a manual overwrite of an existing release"
+          fi
