@@ -207,6 +207,31 @@ export const DURATION_CONVERSION_PATTERNS = [
 export const WEEKS_PATTERN = /^(\d+)w$/i;
 
 // ============================================================================
+// SENTINEL RULE DETECTION
+// ============================================================================
+// Fields that indicate this is likely a Sentinel analytics rule
+export const SENTINEL_RULE_INDICATORS = [
+    // Core Sentinel-specific fields
+    'tactics',
+    'techniques', 
+    'queryFrequency',
+    'queryPeriod',
+    'triggerOperator',
+    'triggerThreshold',
+    'entityMappings',
+    'requiredDataConnectors',
+    
+    // Additional Sentinel fields
+    'suppressionDuration',
+    'alertDetailsOverride',
+    'incidentConfiguration',
+    'eventGroupingSettings'
+] as const;
+
+// Minimum number of indicators required to consider it a Sentinel rule
+export const MIN_SENTINEL_INDICATORS = 3;
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 // Export type definitions for better TypeScript support

@@ -8,7 +8,9 @@ import {
     EXPECTED_ORDER, 
     REQUIRED_FIELDS,
     VALID_TRIGGER_OPERATORS,
-    VALIDATION_PATTERNS
+    VALIDATION_PATTERNS,
+    SENTINEL_RULE_INDICATORS,
+    MIN_SENTINEL_INDICATORS
 } from './constants';
 
 export interface ValidationResult {
@@ -369,7 +371,43 @@ export class SentinelRuleValidator {
     }
 
     private isRelevantDocument(document: vscode.TextDocument): boolean {
-        return (document.languageId === 'yaml' && document.fileName.includes('sentinel'));
+        // Must be a YAML file
+        if (document.languageId !== 'yaml') {
+            return false;
+        }
+
+        // Quick filename check for obvious Sentinel files (optimization)
+        if (document.fileName.includes('sentinel')) {
+            return true;
+        }
+
+        // Content-based detection for any YAML file
+        try {
+            const content = document.getText();
+            
+            // Skip empty or very small files
+            if (content.trim().length < 50) {
+                return false;
+            }
+
+            const parsed = yaml.load(content);
+            
+            if (!parsed || typeof parsed !== 'object') {
+                return false;
+            }
+
+            // Count how many Sentinel-specific fields are present
+            const indicatorCount = SENTINEL_RULE_INDICATORS.filter(indicator => 
+                indicator in parsed
+            ).length;
+
+            // If we have enough indicators, it's likely a Sentinel rule
+            return indicatorCount >= MIN_SENTINEL_INDICATORS;
+
+        } catch (error) {
+            // If YAML parsing fails, not a valid rule anyway
+            return false;
+        }
     }
 
     public dispose() {
