@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -35,10 +35,10 @@
   "homepage": "https://sentinel.blog",
   "repository": {
     "type": "git",
-    "url": "https://github.com/noodlemctwoodle/sentinelcodeguard-vscode"
+    "url": "https://github.com/noodlemctwoodle/SentinelCodeGuard"
   },
   "bugs": {
-    "url": "https://github.com/noodlemctwoodle/sentinelcodeguard-vscode/issues"
+    "url": "https://github.com/noodlemctwoodle/SentinelCodeGuard/issues"
   },
   "license": "MIT",
   "activationEvents": [

@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.3-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.4-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 <p align="center">
   <strong>Professional development toolkit for Microsoft Sentinel Analytics Rules</strong>
@@ -15,14 +15,15 @@
   <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
   <a href="#commands">Commands</a> •
-  <a href="#configuration">Configuration</a>
+  <a href="#configuration">Configuration</a> •
+  <a href="#changelog">Changelog</a>
 </p>
 
 ---
 
 ## ⚠️ Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.3).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/sentinelcodeguard-vscode/issues).
+**SentinelCodeGuard is currently in beta (v0.0.4).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -34,13 +35,14 @@ Created by **noodlemctwoodle** - Visit [sentinel.blog](https://sentinel.blog) fo
 
 ## 🚀 Features
 
-### ✅ **Intelligent Validation**
+### ✅ **Intelligent Content-Based Detection**
 
-- **Real-time validation** with instant feedback
+- **Automatic detection** of Sentinel rules based on content, not filename
+- **Real-time validation** with instant feedback  
 - **Field order enforcement** according to Microsoft best practices
 - **Required field checking** with helpful suggestions
-- **MITRE ATT&CK validation** for tactics and techniques
-- **Data connector validation** for supported connectors
+- **MITRE ATT&CK validation** using framework version 16 data
+- **Configurable data connector validation** (strict/permissive/workspace modes)
 - **YAML syntax validation** with precise error locations
 
 ### 🎯 **Smart Code Assistance**
@@ -55,6 +57,7 @@ Created by **noodlemctwoodle** - Visit [sentinel.blog](https://sentinel.blog) fo
 
 - **Automatic field reordering** according to standards
 - **Missing field completion** with sensible defaults
+- **ISO 8601 duration auto-correction** (e.g., `5m` → `PT5M`)
 - **YAML structure optimization**
 - **Query formatting preservation**
 - **Consistent indentation and spacing**
@@ -66,12 +69,13 @@ Created by **noodlemctwoodle** - Visit [sentinel.blog](https://sentinel.blog) fo
 - **Advanced Rule Template** - Complex rules with all options
 - **Near Real-Time (NRT) Template** - Low-latency detection
 - **Behavior Analytics Template** - ML-based detection
+- **Fallback Template** - Compatibility template
 
 ### 🔍 **Workspace Integration**
 
 - **Bulk validation** across multiple files
 - **Problems panel integration** for centralized error viewing
-- **File pattern recognition** for `.sentinel.yaml` files
+- **Content-based detection** works with any YAML file structure
 - **Context menu commands** for quick actions
 
 ---
@@ -82,12 +86,12 @@ Created by **noodlemctwoodle** - Visit [sentinel.blog](https://sentinel.blog) fo
 
 1. Open VSCode
 2. Go to Extensions (Ctrl+Shift+X)
-3. Search for "Microsoft Sentinel Analytics Rules"
+3. Search for "SentinelCodeGuard"
 4. Click Install
 
 ### Manual Installation
 
-1. Download the `.vsix` file
+1. Download the `.vsix` file from [GitHub Releases](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
 2. Open VSCode
 3. Go to Extensions
 4. Click "..." → "Install from VSIX"
@@ -97,10 +101,40 @@ Created by **noodlemctwoodle** - Visit [sentinel.blog](https://sentinel.blog) fo
 
 ## 🎯 Usage
 
+### Content-Based Detection
+
+**No special file naming required!** The extension automatically detects Sentinel rules by analyzing content. Any YAML file containing 3 or more Sentinel-specific fields will be validated:
+
+- `tactics`, `techniques`, `queryFrequency`, `queryPeriod`
+- `triggerOperator`, `triggerThreshold`, `entityMappings`
+- `requiredDataConnectors`, `suppressionDuration`, etc.
+
+### File Organization Examples
+
+**✅ Works with any structure:**
+```
+detection-rules/
+├── suspicious-login.yaml          # Detected by content
+├── data-exfiltration.yml          # Detected by content  
+├── rules/
+│   ├── privilege-escalation.yaml  # Detected by content
+│   └── malware-detection.yaml     # Detected by content
+└── templates/
+    └── custom-rule.yaml           # Detected by content
+```
+
+**✅ Also works with explicit naming:**
+```
+detection-rules/
+├── suspicious-login.sentinel.yaml
+├── data-exfiltration.sentinel.yml
+└── privilege-escalation.yaml
+```
+
 ### Creating a New Rule
 
 1. **Generate Template**:
-   - Right-click in Explorer → "Generate Sentinel Rule Template"
+   - Right-click in Explorer → "Generate Standard Rule Template"
    - Or use Command Palette: `Sentinel: Generate Standard Rule Template`
 
 2. **Edit Rule**:
@@ -111,15 +145,6 @@ Created by **noodlemctwoodle** - Visit [sentinel.blog](https://sentinel.blog) fo
 3. **Format Rule**:
    - Use `Sentinel: Format Sentinel Rule` command
    - Or use VSCode's built-in format (Shift+Alt+F)
-
-### File Naming Convention
-Use `.sentinel.yaml` or `.sentinel.yml` extensions for automatic detection:
-```
-detection-rules/
-├── suspicious-login.sentinel.yaml
-├── data-exfiltration.sentinel.yaml
-└── privilege-escalation.sentinel.yaml
-```
 
 ### Example Rule Structure
 
@@ -166,7 +191,6 @@ kind: "Scheduled"
 
 | Command | Description | Shortcut |
 |---------|-------------|----------|
-| `Sentinel: Validate Rule` | Validate current rule file | - |
 | `Sentinel: Fix Field Order` | Reorder fields according to standards | - |
 | `Sentinel: Format Sentinel Rule` | Format and optimize rule structure | Shift+Alt+F |
 | `Sentinel: Generate Standard Rule Template` | Create standard rule template | - |
@@ -174,38 +198,53 @@ kind: "Scheduled"
 | `Sentinel: Generate Advanced Rule Template` | Create comprehensive rule template | - |
 | `Sentinel: Generate NRT Rule Template` | Create near real-time rule template | - |
 | `Sentinel: Generate Behavior Analytics Template` | Create ML-based rule template | - |
-| `Sentinel: Validate All Sentinel Rules` | Validate all rules in workspace | - |
+| `Sentinel: Validate All Workspace Rules` | Validate all rules in workspace | - |
 
 ---
 
 ## ⚙️ Configuration
 
-### VSCode Settings
+### Extension Settings
 
-Add these to your VSCode settings for optimal experience:
+The extension provides several configuration options:
 
 ```json
 {
-  "files.associations": {
-    "*.sentinel.yaml": "yaml",
-    "*.sentinel.yml": "yaml"
-  },
-  "editor.formatOnSave": true,
-  "yaml.schemas": {
-    "./schemas/sentinel-analytics-rule-schema.json": "*.sentinel.{yaml,yml}"
-  }
+  "sentinelRules.validation.enabled": true,
+  "sentinelRules.validation.onSave": true,
+  "sentinelRules.validation.onType": false,
+  "sentinelRules.formatting.enabled": true,
+  "sentinelRules.fieldOrdering.enforceOrder": true,
+  "sentinelRules.fieldOrdering.showOrderHints": true,
+  "sentinelRules.intellisense.enabled": true,
+  "sentinelRules.mitre.version": "v16",
+  "sentinelRules.connectors.validationMode": "permissive",
+  "sentinelRules.connectors.customConnectors": [],
+  "sentinelRules.mitre.allowUnknownTactics": true,
+  "sentinelRules.mitre.mitre.allowUnknownTechniques": true,
+  "sentinelRules.mitre.strictValidation": false
 }
 ```
 
-### Workspace Configuration
+### Connector Validation Modes
 
-Create a `.vscode/settings.json` in your workspace:
+- **`permissive`** (default): Accept any valid connector ID format
+- **`strict`**: Only allow known connectors from extension database  
+- **`workspace`**: Allow connectors defined in `.sentinel-connectors.json`
+
+### Custom Workspace Connectors
+
+Create `.sentinel-connectors.json` in your workspace root:
 
 ```json
 {
-  "sentinel.validation.enabled": true,
-  "sentinel.formatting.addMissingFields": true,
-  "sentinel.templates.defaultSeverity": "Medium"
+  "connectors": [
+    {
+      "id": "MyCustomConnector",
+      "displayName": "My Custom Data Connector",
+      "dataTypes": ["CustomLogs", "CustomEvents"]
+    }
+  ]
 }
 ```
 
@@ -216,7 +255,7 @@ Create a `.vscode/settings.json` in your workspace:
 The extension enforces this field order for consistency:
 
 1. `id` - Unique identifier
-2. `name` - Rule display name
+2. `name` - Rule display name  
 3. `description` - Rule description
 4. `severity` - Alert severity level
 5. `requiredDataConnectors` - Data source requirements
@@ -234,29 +273,111 @@ The extension enforces this field order for consistency:
 
 ---
 
+## 📋 Changelog
+
+### v0.0.4 (2025-01-24)
+
+#### 🆕 **New Features**
+- **Content-based rule detection**: Automatically detects Sentinel rules by analyzing YAML content, not filename patterns
+- **Modular architecture**: Split monolithic code into focused modules for better maintainability
+- **Enhanced debugging**: Added comprehensive logging for troubleshooting extension activation and command registration
+
+#### 🔧 **Improvements**
+- **Fixed command registration**: Resolved import path issues causing "command not found" errors in packaged extension
+- **Repository migration**: Updated all repository URLs to point to new GitHub location
+- **Documentation overhaul**: Updated README to accurately reflect current features and capabilities
+- **Removed unnecessary manual configuration**: Extension now works automatically without user setup
+
+#### 🐛 **Bug Fixes**
+- Fixed extension activation in compiled VSIX packages
+- Corrected command import paths for proper module resolution
+- Resolved template generation command registration issues
+
+---
+
+### v0.0.3 (2025-01-23)
+
+#### 🔧 **Improvements**
+- **Dynamic validation**: Implemented content-based Sentinel rule detection
+- **Import path corrections**: Fixed module import issues for command registration
+- **Extension packaging**: Improved build process and file inclusion
+
+#### 🐛 **Bug Fixes**
+- Resolved command not found errors in installed extension
+- Fixed extension activation issues in non-development environments
+
+---
+
+### v0.0.2 (2025-01-22)
+
+#### 🆕 **New Features**
+- **MITRE ATT&CK v16**: Updated to latest framework data with dynamic loading
+- **Configurable connector validation**: Added strict/permissive/workspace validation modes
+- **ISO 8601 duration auto-correction**: Automatically fixes duration formats
+- **Professional formatting**: Enhanced field reordering and missing field completion
+
+#### 🔧 **Improvements**
+- **Removed hard-coded lists**: All validation now uses dynamic data loaders
+- **Extensible entity types**: Support for custom entity mappings
+- **Improved error handling**: Better fallback mechanisms and user feedback
+- **Template management**: Complete set of rule templates for different use cases
+
+---
+
+### v0.0.1 (2025-01-21)
+
+#### 🆕 **Initial Release**
+- **Basic YAML validation**: Initial Sentinel analytics rule validation
+- **Field order checking**: Enforcement of Microsoft recommended field ordering
+- **Template generation**: Basic rule template creation
+- **MITRE validation**: Initial MITRE ATT&CK tactics and techniques validation
+- **VS Code integration**: Problems panel integration and syntax highlighting
+
+---
+
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-**Extension not activating:**
+**Extension not detecting my YAML file:**
 
-- Check that files use `.sentinel.yaml` or `.sentinel.yml` extensions
-- Restart VSCode Extension Host (`Developer: Restart Extension Host`)
+- Ensure the file contains at least 3 Sentinel-specific fields
+- Check that YAML syntax is valid
+- Look for fields like: `tactics`, `techniques`, `queryFrequency`, `entityMappings`
+
+**Commands not appearing:**
+
+- Open any YAML file to trigger extension activation
+- Check VS Code Developer Console (Help → Toggle Developer Tools) for errors
+- Restart VS Code Extension Host (`Developer: Restart Extension Host`)
 
 **Validation not working:**
 
-- Ensure YAML syntax is valid
-- Check file is properly detected (should show language as "YAML")
+- Ensure YAML syntax is valid first
+- Check extension settings are enabled
+- Look at Problems panel for detailed diagnostics
 
 **Templates not loading:**
 
-- Verify template files exist in `templates/` folder
-- Check extension installation is complete
+- Verify extension is properly installed
+- Check Developer Console for template loading errors
 
-**Formatting issues:**
+---
 
-- Use `Sentinel: Format Sentinel Rule` instead of generic YAML formatting
-- Check for syntax errors before formatting
+## 🏗️ Architecture
+
+### Modular Design
+
+- **Content-based detection**: Automatically identifies Sentinel rules
+- **Dynamic data loaders**: MITRE v16 and connector data
+- **Configurable validation**: Strict, permissive, or workspace modes
+- **Extensible templates**: Easy to add new rule types
+
+### Data Sources
+
+- **MITRE ATT&CK**: Framework v16 (bundled, updateable)
+- **Entity Types**: Latest Microsoft Sentinel entities  
+- **Connectors**: Configurable with fallback modes
 
 ---
 
@@ -264,7 +385,7 @@ The extension enforces this field order for consistency:
 
 We welcome contributions! Please:
 
-1. Fork the repository
+1. Fork the [repository](https://github.com/noodlemctwoodle/SentinelCodeGuard)
 2. Create a feature branch
 3. Make your changes
 4. Add tests if applicable
@@ -274,7 +395,7 @@ We welcome contributions! Please:
 
 ## 📄 License
 
-This extension is licensed under the MIT License. See LICENSE file for details.
+This extension is licensed under the MIT License. See [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE) file for details.
 
 ---
 
