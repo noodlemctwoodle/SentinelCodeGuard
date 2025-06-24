@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -113,6 +113,11 @@
         "command": "sentinelRules.validateWorkspace",
         "title": "Validate All Workspace Rules",
         "category": "Sentinel Rules"
+      },
+      {
+        "command": "sentinelRules.convertArmToYaml",
+        "title": "Convert ARM Template to YAML",
+        "category": "Sentinel Rules"
       }
     ],
     "menus": {
@@ -126,6 +131,11 @@
           "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
           "command": "sentinelRules.formatRule",
           "group": "sentinel@2"
+        },
+        {
+          "when": "resourceExtname == .json",
+          "command": "sentinelRules.convertArmToYaml",
+          "group": "sentinel@3"
         }
       ],
       "explorer/context": [
@@ -149,6 +159,9 @@
         },
         {
           "command": "sentinelRules.validateWorkspace"
+        },
+        {
+          "command": "sentinelRules.convertArmToYaml"
         }
       ]
     },
@@ -245,6 +258,75 @@
           "type": "boolean",
           "default": false,
           "description": "Require all tactics/techniques to be in loaded MITRE data (shows errors for unknown items)"
+        },
+        "sentinelRules.conversion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable ARM template to YAML conversion functionality"
+        },
+        "sentinelRules.conversion.defaultNamingStrategy": {
+          "type": "string",
+          "enum": [
+            "original",
+            "displayName", 
+            "ruleId"
+          ],
+          "default": "displayName",
+          "enumDescriptions": [
+            "Use original filename with .yaml extension",
+            "Use rule's displayName property as filename", 
+            "Use rule's unique identifier as filename"
+          ],
+          "description": "Default strategy for naming converted YAML files"
+        },
+        "sentinelRules.conversion.validateMitreOnConversion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate and correct MITRE tactics/techniques during conversion"
+        },
+        "sentinelRules.conversion.autoFormatAfterConversion": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format converted YAML files using SentinelCodeGuard formatting"
+        },
+        "sentinelRules.conversion.showConversionSummary": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show conversion summary dialog with warnings and results"
+        },
+        "sentinelRules.conversion.outputDirectory": {
+          "type": "string",
+          "default": "",
+          "description": "Custom output directory for converted files (empty = same directory as source)"
+        },
+        "sentinelRules.conversion.preserveQueryFormatting": {
+          "type": "boolean",
+          "default": true,
+          "description": "Preserve original KQL query formatting in converted YAML"
+        },
+        "sentinelRules.conversion.includeOptionalFields": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include optional fields with default values in converted YAML"
+        },
+        "sentinelRules.conversion.validateEntityMappings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate entity types and identifiers during conversion"
+        },
+        "sentinelRules.conversion.defaultVersion": {
+          "type": "string",
+          "default": "1.0.0",
+          "description": "Default version for rules missing templateVersion in ARM template"
+        },
+        "sentinelRules.conversion.defaultStatus": {
+          "type": "string",
+          "enum": [
+            "Available",
+            "Disabled"
+          ],
+          "default": "Available",
+          "description": "Default status when enabled=true in ARM template"
         }
       }
     },
