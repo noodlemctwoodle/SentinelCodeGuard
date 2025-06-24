@@ -5,6 +5,13 @@ on:
     branches: [ main ]
     paths:
       - 'package.json'  # Only trigger when package.json changes
+  workflow_dispatch:  # Add manual trigger
+    inputs:
+      force_release:
+        description: 'Force create release for current version'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   check-release:
@@ -57,28 +64,42 @@ jobs:
           echo "Is Beta: $IS_BETA"
           echo "Tag Name: $TAG_NAME"
           
-          # Check if version changed compared to previous commit
-          if git show HEAD~1:package.json &>/dev/null; then
-            PREVIOUS_VERSION=$(git show HEAD~1:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).version")
-            echo "Previous version: $PREVIOUS_VERSION"
-            
-            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
-              SHOULD_RELEASE="true"
-              echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION - will create release"
-            else
-              SHOULD_RELEASE="false"
-              echo "Version unchanged - no release needed"
-            fi
-          else
-            # First commit or package.json didn't exist before
+          # Initialize SHOULD_RELEASE
+          SHOULD_RELEASE="false"
+          
+          # Check for manual trigger first
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.force_release }}" = "true" ]; then
             SHOULD_RELEASE="true"
-            echo "Initial version $CURRENT_VERSION - will create release"
+            echo "Manual release triggered - forcing release creation"
+          else
+            # Check if version changed compared to previous commit
+            if git show HEAD~1:package.json &>/dev/null; then
+              PREVIOUS_VERSION=$(git show HEAD~1:package.json | node -p "JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8')).version")
+              echo "Previous version: $PREVIOUS_VERSION"
+              
+              if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+                SHOULD_RELEASE="true"
+                echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION - will create release"
+              else
+                SHOULD_RELEASE="false"
+                echo "Version unchanged - no release needed"
+              fi
+            else
+              # First commit or package.json didn't exist before
+              SHOULD_RELEASE="true"
+              echo "Initial version $CURRENT_VERSION - will create release"
+            fi
           fi
           
-          # Check if tag already exists
+          # Check if tag already exists (but allow override for manual trigger)
           if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Tag $TAG_NAME already exists - skipping release"
-            SHOULD_RELEASE="false"
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "Tag $TAG_NAME already exists but manual trigger will recreate release"
+              # Keep SHOULD_RELEASE as true for manual trigger
+            else
+              echo "Tag $TAG_NAME already exists - skipping release"
+              SHOULD_RELEASE="false"
+            fi
           fi
           
           # Set outputs
@@ -115,10 +136,19 @@ jobs:
       - name: Package extension
         run: npm run package
         
-      - name: Create Git tag
+      - name: Create or update Git tag
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          
+          # Delete tag if it exists (for manual triggers)
+          if git rev-parse "${{ needs.check-release.outputs.tag-name }}" >/dev/null 2>&1; then
+            echo "Deleting existing tag ${{ needs.check-release.outputs.tag-name }}"
+            git tag -d "${{ needs.check-release.outputs.tag-name }}" || true
+            git push origin --delete "${{ needs.check-release.outputs.tag-name }}" || true
+          fi
+          
+          # Create new tag
           git tag ${{ needs.check-release.outputs.tag-name }}
           git push origin ${{ needs.check-release.outputs.tag-name }}
           
@@ -167,6 +197,16 @@ jobs:
           EOF
           
           echo "release-notes-file=release_notes.md" >> $GITHUB_OUTPUT
+          
+      - name: Delete existing release if it exists
+        run: |
+          # Delete existing release if it exists (for manual re-runs)
+          if gh release view "${{ needs.check-release.outputs.tag-name }}" >/dev/null 2>&1; then
+            echo "Deleting existing release ${{ needs.check-release.outputs.tag-name }}"
+            gh release delete "${{ needs.check-release.outputs.tag-name }}" --yes || true
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
