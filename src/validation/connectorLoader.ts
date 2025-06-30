@@ -7,6 +7,7 @@ interface ConnectorInfo {
     dataTypes: string[];
     category?: string;
     deprecated?: boolean;
+    description?: string;
 }
 
 export class ConnectorLoader {
@@ -21,9 +22,15 @@ export class ConnectorLoader {
         try {
             await this.loadFromEmbeddedData();
         } catch (error) {
-            console.error('Failed to load connector data:', error);
+            console.warn('Could not load connector data from embedded file, using fallback:', error);
             this.loadFallbackData();
         }
+        
+        // Always load workspace and custom connectors in addition to the base set
+        await this.loadFromWorkspace();
+        await this.loadCustomConnectors();
+        
+        console.log(`✅ Total connectors available: ${this.connectors.size}`);
     }
 
     private static async loadFromEmbeddedData(): Promise<void> {
@@ -53,9 +60,14 @@ export class ConnectorLoader {
     }
 
     private static loadFallbackData() {
-        // Fallback logic to load connector data
         console.log('Loading fallback connector data...');
-        // For example, load some default connectors or handle the error gracefully
+        
+        // Clear any existing connectors
+        this.connectors.clear();
+        
+        // In fallback mode, we just provide an empty set
+        // This allows the permissive validation mode to work for any connector ID
+        console.log('✅ Fallback mode: allowing any valid connector ID format');
     }
 
     private static async loadFromWorkspace(): Promise<void> {
@@ -160,8 +172,13 @@ export class ConnectorLoader {
         return this.connectors.get(connectorId);
     }
 
-    public static getAllConnectors(): ConnectorInfo[] {
-        return Array.from(this.connectors.values());
+    public static getAllConnectors(): Array<{id: string, name: string, description: string, dataTypes: string[]}> {
+        return Array.from(this.connectors.values()).map(connector => ({
+            id: connector.id,
+            name: connector.displayName,
+            description: connector.description || `${connector.displayName} data connector${connector.category ? ` (${connector.category})` : ''}`,
+            dataTypes: connector.dataTypes
+        }));
     }
 
     public static getConnectorSuggestions(partial: string): string[] {

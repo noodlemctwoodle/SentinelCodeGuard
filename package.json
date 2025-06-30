@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -41,11 +41,10 @@
     "url": "https://github.com/noodlemctwoodle/SentinelCodeGuard/issues"
   },
   "license": "MIT",
-  "activationEvents": [
-    "onLanguage:yaml",
-    "onLanguage:sentinel-rule"
-  ],
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:yaml"
+  ],
   "contributes": {
     "languages": [
       {
@@ -370,21 +369,5 @@
     "js-yaml": "^4.1.0",
     "jsonschema": "^1.4.1",
     "uuid": "^9.0.0"
-  },
-  "files": [
-    "out/**",
-    "images/**",
-    "templates/**",
-    "schemas/**",
-    "snippets/**",
-    "syntaxes/**",
-    "data/**",
-    "language-configuration.json",
-    "README.md",
-    "LICENSE.txt",
-    "node_modules/js-yaml/**",
-    "node_modules/jsonschema/**",
-    "node_modules/uuid/**",
-    "node_modules/argparse/**"
-  ]
+  }
 }

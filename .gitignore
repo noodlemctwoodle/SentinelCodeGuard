@@ -144,3 +144,5 @@ docs/_build/
 # Local development files
 .local/
 local/
+
+SentinelCodeGuard.code-workspace

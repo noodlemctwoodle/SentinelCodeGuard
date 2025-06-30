@@ -124,7 +124,7 @@ export class SentinelRuleValidator {
         this.validateEntityTypes(parsedYaml, lines, warnings);
 
         // Validate MITRE techniques and tactics
-        this.validateMitreTechniques(parsedYaml, lines, warnings);
+        this.validateMitreTechniques(parsedYaml, lines, errors, warnings);
 
         // Validate data connectors
         this.validateDataConnectors(parsedYaml, lines, warnings);
@@ -203,7 +203,7 @@ export class SentinelRuleValidator {
         }
     }
 
-    private validateMitreTechniques(parsedYaml: any, lines: string[], warnings: vscode.Diagnostic[]) {
+    private validateMitreTechniques(parsedYaml: any, lines: string[], errors: vscode.Diagnostic[], warnings: vscode.Diagnostic[]) {
         // Validate techniques using the MitreLoader validation methods
         if (parsedYaml.techniques && Array.isArray(parsedYaml.techniques)) {
             parsedYaml.techniques.forEach((technique: string) => {
@@ -217,12 +217,12 @@ export class SentinelRuleValidator {
                             validation.severity
                         );
                         
+                        // Add to appropriate array based on severity
                         if (validation.severity === vscode.DiagnosticSeverity.Error) {
-                            // Since we're in the warnings section, let's change errors to warnings for consistency
-                            diagnostic.severity = vscode.DiagnosticSeverity.Warning;
+                            errors.push(diagnostic);
+                        } else {
+                            warnings.push(diagnostic);
                         }
-                        
-                        warnings.push(diagnostic);
                     }
                 }
             });
@@ -241,12 +241,40 @@ export class SentinelRuleValidator {
                             validation.severity
                         );
                         
+                        // Add to appropriate array based on severity
                         if (validation.severity === vscode.DiagnosticSeverity.Error) {
-                            // Since we're in the warnings section, let's change errors to warnings for consistency
-                            diagnostic.severity = vscode.DiagnosticSeverity.Warning;
+                            errors.push(diagnostic);
+                        } else {
+                            warnings.push(diagnostic);
                         }
-                        
-                        warnings.push(diagnostic);
+                    }
+                }
+            });
+        }
+
+        // Validate subtechniques (nested in techniques array with dot notation)
+        if (parsedYaml.techniques && Array.isArray(parsedYaml.techniques)) {
+            parsedYaml.techniques.forEach((technique: string) => {
+                // If it's a sub-technique (contains a dot), validate both the main technique and sub-technique
+                if (technique.includes('.')) {
+                    const [mainTechnique] = technique.split('.');
+                    const mainValidation = MitreLoader.validateTechnique(mainTechnique);
+                    
+                    if (!mainValidation.isValidFormat || (!mainValidation.isKnown && mainValidation.message)) {
+                        const line = this.findFieldLine(lines, 'techniques', technique);
+                        if (line !== -1) {
+                            const diagnostic = new vscode.Diagnostic(
+                                new vscode.Range(line, 0, line, lines[line].length),
+                                `Parent technique '${mainTechnique}' validation failed: ${mainValidation.message}`,
+                                mainValidation.severity
+                            );
+                            
+                            if (mainValidation.severity === vscode.DiagnosticSeverity.Error) {
+                                errors.push(diagnostic);
+                            } else {
+                                warnings.push(diagnostic);
+                            }
+                        }
                     }
                 }
             });
@@ -311,6 +339,18 @@ export class SentinelRuleValidator {
             }
 
             const indentation = line.length - line.trimStart().length;
+            
+            // Handle array items (lines starting with -)
+            if (trimmedLine.startsWith('-')) {
+                if (inTargetSection && value) {
+                    const arrayValue = trimmedLine.substring(1).trim();
+                    if (arrayValue.includes(value) || arrayValue === value) {
+                        return i;
+                    }
+                }
+                continue;
+            }
+
             const colonIndex = trimmedLine.indexOf(':');
             
             if (colonIndex === -1) {

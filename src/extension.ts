@@ -6,6 +6,7 @@ import { createFormattingProvider } from './providers/formatProvider';
 import { DocumentListenerManager } from './listeners/documentListeners';
 import { MitreLoader } from './validation/mitreLoader';
 import { ConnectorLoader } from './validation/connectorLoader';
+import { SentinelCompletionProvider } from './providers/completionProvider';
 
 function getErrorMessage(error: unknown): string {
     if (error instanceof Error) {
@@ -56,6 +57,13 @@ export async function activate(context: vscode.ExtensionContext) {
         
         const formatterProvider = createFormattingProvider();
         console.log('🎨 SentinelCodeGuard: Registered formatting provider');
+
+        const completionProvider = vscode.languages.registerCompletionItemProvider(
+            { scheme: 'file', language: 'yaml' },
+            new SentinelCompletionProvider(),
+            ':', '"', "'"  // Trigger characters
+        );
+        context.subscriptions.push(completionProvider);
 
         // Add all disposables to context subscriptions
         context.subscriptions.push(

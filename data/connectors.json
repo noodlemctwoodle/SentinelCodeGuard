@@ -1,0 +1,641 @@
+{
+  "connectors": [
+    {
+      "id": "AzureActiveDirectory",
+      "displayName": "Azure Active Directory",
+      "dataTypes": ["SigninLogs", "AuditLogs", "AADNonInteractiveUserSignInLogs", "AADServicePrincipalSignInLogs", "AADManagedIdentitySignInLogs"],
+      "category": "Identity"
+    },
+    {
+      "id": "SecurityEvents",
+      "displayName": "Security Events via AMA",
+      "dataTypes": ["SecurityEvent"],
+      "category": "Security"
+    },
+    {
+      "id": "WindowsSecurityEvents",
+      "displayName": "Windows Security Events via Legacy Agent",
+      "dataTypes": ["SecurityEvent"],
+      "category": "Security",
+      "deprecated": true
+    },
+    {
+      "id": "CommonSecurityLog",
+      "displayName": "Common Event Format (CEF)",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "Syslog",
+      "displayName": "Syslog",
+      "dataTypes": ["Syslog"],
+      "category": "Security"
+    },
+    {
+      "id": "WindowsFirewall",
+      "displayName": "Windows Firewall",
+      "dataTypes": ["AzureDiagnostics"],
+      "category": "Network"
+    },
+    {
+      "id": "AzureActivity",
+      "displayName": "Azure Activity",
+      "dataTypes": ["AzureActivity"],
+      "category": "Management"
+    },
+    {
+      "id": "Office365",
+      "displayName": "Office 365",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Productivity"
+    },
+    {
+      "id": "ThreatIntelligence",
+      "displayName": "Threat Intelligence Platforms",
+      "dataTypes": ["ThreatIntelligenceIndicator"],
+      "category": "Intelligence"
+    },
+    {
+      "id": "DNS",
+      "displayName": "DNS",
+      "dataTypes": ["DnsEvents"],
+      "category": "Network"
+    },
+    {
+      "id": "AWSCloudTrail",
+      "displayName": "AWS CloudTrail",
+      "dataTypes": ["AWSCloudTrail"],
+      "category": "Cloud"
+    },
+    {
+      "id": "AzureFirewall",
+      "displayName": "Azure Firewall",
+      "dataTypes": ["AzureDiagnostics"],
+      "category": "Network"
+    },
+    {
+      "id": "MicrosoftDefenderForEndpoint",
+      "displayName": "Microsoft Defender for Endpoint",
+      "dataTypes": ["DeviceEvents", "DeviceProcessEvents", "DeviceNetworkEvents", "DeviceFileEvents", "DeviceRegistryEvents", "DeviceLogonEvents", "DeviceImageLoadEvents"],
+      "category": "Security"
+    },
+    {
+      "id": "MicrosoftDefenderForCloud",
+      "displayName": "Microsoft Defender for Cloud",
+      "dataTypes": ["SecurityAlert", "SecurityRecommendation"],
+      "category": "Security"
+    },
+    {
+      "id": "AzureKeyVault",
+      "displayName": "Azure Key Vault",
+      "dataTypes": ["KeyVaultData"],
+      "category": "Security"
+    },
+    {
+      "id": "MicrosoftDefenderForOffice365",
+      "displayName": "Microsoft Defender for Office 365",
+      "dataTypes": ["SecurityAlert", "SecurityIncident"],
+      "category": "Security"
+    },
+    {
+      "id": "MicrosoftDefenderForIdentity",
+      "displayName": "Microsoft Defender for Identity",
+      "dataTypes": ["SecurityAlert"],
+      "category": "Identity"
+    },
+    {
+      "id": "MicrosoftDefenderForCloudApps",
+      "displayName": "Microsoft Defender for Cloud Apps",
+      "dataTypes": ["McasShadowItReporting"],
+      "category": "Security"
+    },
+    {
+      "id": "AzureInformationProtection",
+      "displayName": "Azure Information Protection",
+      "dataTypes": ["InformationProtectionLogs_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "MicrosoftPurview",
+      "displayName": "Microsoft Purview",
+      "dataTypes": ["PurviewDataMap"],
+      "category": "Compliance"
+    },
+    {
+      "id": "SymantecICDx",
+      "displayName": "Symantec ICDx",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "SymantecProxySG",
+      "displayName": "Symantec ProxySG",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Network"
+    },
+    {
+      "id": "F5BIG-IP",
+      "displayName": "F5 BIG-IP",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Network"
+    },
+    {
+      "id": "FortiGate",
+      "displayName": "Fortinet FortiGate",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "CheckPoint",
+      "displayName": "Check Point",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "PaloAltoNetworks",
+      "displayName": "Palo Alto Networks",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "CiscoASA",
+      "displayName": "Cisco ASA",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Network"
+    },
+    {
+      "id": "CiscoMeraki",
+      "displayName": "Cisco Meraki",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "CiscoUmbrella",
+      "displayName": "Cisco Umbrella",
+      "dataTypes": ["Cisco_Umbrella_dns_CL", "Cisco_Umbrella_proxy_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "Zscaler",
+      "displayName": "Zscaler",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "Okta",
+      "displayName": "Okta",
+      "dataTypes": ["Okta_CL"],
+      "category": "Identity"
+    },
+    {
+      "id": "OneLogin",
+      "displayName": "OneLogin",
+      "dataTypes": ["OneLogin_CL"],
+      "category": "Identity"
+    },
+    {
+      "id": "Ping",
+      "displayName": "Ping Identity",
+      "dataTypes": ["PingFederate_CL"],
+      "category": "Identity"
+    },
+    {
+      "id": "CrowdStrike",
+      "displayName": "CrowdStrike Falcon",
+      "dataTypes": ["CrowdStrike_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "SentinelOne",
+      "displayName": "SentinelOne",
+      "dataTypes": ["SentinelOne_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "CarbonBlack",
+      "displayName": "VMware Carbon Black",
+      "dataTypes": ["CarbonBlack_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "TrendMicro",
+      "displayName": "Trend Micro",
+      "dataTypes": ["TrendMicro_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "McAfee",
+      "displayName": "McAfee ePolicy Orchestrator",
+      "dataTypes": ["McAfeeePO_CL"],
+      "category": "Security"
+    },
+    {
+      "id": "Splunk",
+      "displayName": "Splunk",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Analytics"
+    },
+    {
+      "id": "QRadar",
+      "displayName": "IBM QRadar",
+      "dataTypes": ["QRadar_CL"],
+      "category": "Analytics"
+    },
+    {
+      "id": "ArcSight",
+      "displayName": "Micro Focus ArcSight",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Analytics"
+    },
+    {
+      "id": "Exabeam",
+      "displayName": "Exabeam",
+      "dataTypes": ["Exabeam_CL"],
+      "category": "Analytics"
+    },
+    {
+      "id": "RSANetWitness",
+      "displayName": "RSA NetWitness",
+      "dataTypes": ["RSANetWitness_CL"],
+      "category": "Analytics"
+    },
+    {
+      "id": "Salesforce",
+      "displayName": "Salesforce",
+      "dataTypes": ["Salesforce_CL"],
+      "category": "Cloud"
+    },
+    {
+      "id": "ServiceNow",
+      "displayName": "ServiceNow",
+      "dataTypes": ["ServiceNow_CL"],
+      "category": "Management"
+    },
+    {
+      "id": "Box",
+      "displayName": "Box",
+      "dataTypes": ["Box_CL"],
+      "category": "Cloud"
+    },
+    {
+      "id": "Dropbox",
+      "displayName": "Dropbox",
+      "dataTypes": ["Dropbox_CL"],
+      "category": "Cloud"
+    },
+    {
+      "id": "GoogleWorkspace",
+      "displayName": "Google Workspace",
+      "dataTypes": ["GWorkspace_CL"],
+      "category": "Productivity"
+    },
+    {
+      "id": "Slack",
+      "displayName": "Slack",
+      "dataTypes": ["Slack_CL"],
+      "category": "Productivity"
+    },
+    {
+      "id": "Zoom",
+      "displayName": "Zoom",
+      "dataTypes": ["Zoom_CL"],
+      "category": "Productivity"
+    },
+    {
+      "id": "Teams",
+      "displayName": "Microsoft Teams",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Productivity"
+    },
+    {
+      "id": "Exchange",
+      "displayName": "Exchange Online",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Productivity"
+    },
+    {
+      "id": "SharePoint",
+      "displayName": "SharePoint Online",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Productivity"
+    },
+    {
+      "id": "OneDrive",
+      "displayName": "OneDrive for Business",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Productivity"
+    },
+    {
+      "id": "PowerBI",
+      "displayName": "Power BI",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Analytics"
+    },
+    {
+      "id": "Dynamics365",
+      "displayName": "Dynamics 365",
+      "dataTypes": ["OfficeActivity"],
+      "category": "Business"
+    },
+    {
+      "id": "AWSGuardDuty",
+      "displayName": "AWS GuardDuty",
+      "dataTypes": ["AWSGuardDuty"],
+      "category": "Cloud"
+    },
+    {
+      "id": "AWSVPC",
+      "displayName": "AWS VPC Flow Logs",
+      "dataTypes": ["AWSVPCFlowLogs"],
+      "category": "Network"
+    },
+    {
+      "id": "AWSWAFv2",
+      "displayName": "AWS WAF",
+      "dataTypes": ["AWSWAFv2"],
+      "category": "Security"
+    },
+    {
+      "id": "GCPCloudMonitoring",
+      "displayName": "Google Cloud Platform",
+      "dataTypes": ["GCPAuditLogs"],
+      "category": "Cloud"
+    },
+    {
+      "id": "AzureNetworkSecurityGroups",
+      "displayName": "Azure Network Security Groups",
+      "dataTypes": ["AzureNetworkAnalytics_CL"],
+      "category": "Network"
+    },
+    {
+      "id": "AzureApplicationGateway",
+      "displayName": "Azure Application Gateway",
+      "dataTypes": ["AzureDiagnostics"],
+      "category": "Network"
+    },
+    {
+      "id": "AzureLoadBalancer",
+      "displayName": "Azure Load Balancer",
+      "dataTypes": ["AzureDiagnostics"],
+      "category": "Network"
+    },
+    {
+      "id": "AzureSQL",
+      "displayName": "Azure SQL Database",
+      "dataTypes": ["AzureDiagnostics"],
+      "category": "Database"
+    },
+    {
+      "id": "AzureCosmosDB",
+      "displayName": "Azure Cosmos DB",
+      "dataTypes": ["AzureDiagnostics"],
+      "category": "Database"
+    },
+    {
+      "id": "AzureKubernetes",
+      "displayName": "Azure Kubernetes Service",
+      "dataTypes": ["KubernetesEvents", "ContainerLog"],
+      "category": "Container"
+    },
+    {
+      "id": "AzureDevOps",
+      "displayName": "Azure DevOps",
+      "dataTypes": ["AzureDevOpsAuditing"],
+      "category": "Development"
+    },
+    {
+      "id": "GitHub",
+      "displayName": "GitHub",
+      "dataTypes": ["GitHub_CL"],
+      "category": "Development"
+    },
+    {
+      "id": "GitLab",
+      "displayName": "GitLab",
+      "dataTypes": ["GitLab_CL"],
+      "category": "Development"
+    },
+    {
+      "id": "Jenkins",
+      "displayName": "Jenkins",
+      "dataTypes": ["Jenkins_CL"],
+      "category": "Development"
+    },
+    {
+      "id": "Docker",
+      "displayName": "Docker",
+      "dataTypes": ["ContainerLog"],
+      "category": "Container"
+    },
+    {
+      "id": "Nginx",
+      "displayName": "Nginx",
+      "dataTypes": ["Syslog"],
+      "category": "Web"
+    },
+    {
+      "id": "Apache",
+      "displayName": "Apache HTTP Server",
+      "dataTypes": ["Syslog"],
+      "category": "Web"
+    },
+    {
+      "id": "IIS",
+      "displayName": "Internet Information Services",
+      "dataTypes": ["W3CIISLog"],
+      "category": "Web"
+    },
+    {
+      "id": "Tomcat",
+      "displayName": "Apache Tomcat",
+      "dataTypes": ["Syslog"],
+      "category": "Web"
+    },
+    {
+      "id": "Oracle",
+      "displayName": "Oracle Database",
+      "dataTypes": ["Oracle_CL"],
+      "category": "Database"
+    },
+    {
+      "id": "MySQL",
+      "displayName": "MySQL",
+      "dataTypes": ["Syslog"],
+      "category": "Database"
+    },
+    {
+      "id": "PostgreSQL",
+      "displayName": "PostgreSQL",
+      "dataTypes": ["Syslog"],
+      "category": "Database"
+    },
+    {
+      "id": "MongoDB",
+      "displayName": "MongoDB",
+      "dataTypes": ["Syslog"],
+      "category": "Database"
+    },
+    {
+      "id": "Redis",
+      "displayName": "Redis",
+      "dataTypes": ["Syslog"],
+      "category": "Database"
+    },
+    {
+      "id": "Elasticsearch",
+      "displayName": "Elasticsearch",
+      "dataTypes": ["Syslog"],
+      "category": "Analytics"
+    },
+    {
+      "id": "Kafka",
+      "displayName": "Apache Kafka",
+      "dataTypes": ["Syslog"],
+      "category": "Analytics"
+    },
+    {
+      "id": "RabbitMQ",
+      "displayName": "RabbitMQ",
+      "dataTypes": ["Syslog"],
+      "category": "Messaging"
+    },
+    {
+      "id": "ActiveDirectory",
+      "displayName": "Active Directory",
+      "dataTypes": ["SecurityEvent"],
+      "category": "Identity"
+    },
+    {
+      "id": "ADFS",
+      "displayName": "Active Directory Federation Services",
+      "dataTypes": ["SecurityEvent"],
+      "category": "Identity"
+    },
+    {
+      "id": "DomainController",
+      "displayName": "Domain Controller",
+      "dataTypes": ["SecurityEvent"],
+      "category": "Identity"
+    },
+    {
+      "id": "DHCP",
+      "displayName": "DHCP Server",
+      "dataTypes": ["DhcpSrvLog"],
+      "category": "Network"
+    },
+    {
+      "id": "WindowsDNS",
+      "displayName": "Windows DNS Server",
+      "dataTypes": ["DnsEvents"],
+      "category": "Network"
+    },
+    {
+      "id": "Bind9",
+      "displayName": "BIND DNS Server",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "Squid",
+      "displayName": "Squid Proxy",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "HAProxy",
+      "displayName": "HAProxy",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "Juniper",
+      "displayName": "Juniper Networks",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Network"
+    },
+    {
+      "id": "Aruba",
+      "displayName": "Aruba Networks",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Network"
+    },
+    {
+      "id": "Sophos",
+      "displayName": "Sophos",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "Barracuda",
+      "displayName": "Barracuda",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "SonicWall",
+      "displayName": "SonicWall",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "WatchGuard",
+      "displayName": "WatchGuard",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "pfSense",
+      "displayName": "pfSense",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "OPNsense",
+      "displayName": "OPNsense",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "Infoblox",
+      "displayName": "Infoblox",
+      "dataTypes": ["Syslog"],
+      "category": "Network"
+    },
+    {
+      "id": "BlueCoat",
+      "displayName": "Blue Coat ProxySG",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Network"
+    },
+    {
+      "id": "Imperva",
+      "displayName": "Imperva WAF",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "F5ASM",
+      "displayName": "F5 Application Security Manager",
+      "dataTypes": ["CommonSecurityLog"],
+      "category": "Security"
+    },
+    {
+      "id": "Akamai",
+      "displayName": "Akamai",
+      "dataTypes": ["Akamai_CL"],
+      "category": "CDN"
+    },
+    {
+      "id": "Cloudflare",
+      "displayName": "Cloudflare",
+      "dataTypes": ["Cloudflare_CL"],
+      "category": "CDN"
+    },
+    {
+      "id": "FastlyWAF",
+      "displayName": "Fastly WAF",
+      "dataTypes": ["FastlyWAF_CL"],
+      "category": "Security"
+    }
+  ]
+}

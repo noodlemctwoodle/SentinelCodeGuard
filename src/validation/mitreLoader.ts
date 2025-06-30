@@ -5,11 +5,20 @@ interface MitreTechnique {
     id: string;
     name: string;
     tactics: string[];
+    description?: string;
+    parent?: string;
+}
+
+interface MitreTactic {
+    id: string;
+    name: string;
+    description: string;
 }
 
 export class MitreLoader {
     private static techniques: Map<string, MitreTechnique> = new Map();
     private static tactics: Set<string> = new Set();
+    private static tacticDetails: Map<string, MitreTactic> = new Map();
     private static extensionContext: vscode.ExtensionContext;
 
     public static setExtensionContext(context: vscode.ExtensionContext) {
@@ -46,40 +55,82 @@ export class MitreLoader {
             
             this.techniques.clear();
             this.tactics.clear();
+            this.tacticDetails.clear();
             
-            for (const technique of mitreData.techniques) {
-                this.techniques.set(technique.id, technique);
-                technique.tactics.forEach((tactic: string) => this.tactics.add(tactic));
+            // Load tactics from the tactics array first (primary source)
+            if (mitreData.tactics && Array.isArray(mitreData.tactics)) {
+                for (const tactic of mitreData.tactics) {
+                    if (tactic.name) {
+                        this.tactics.add(tactic.name);
+                        this.tacticDetails.set(tactic.name, {
+                            id: tactic.id,
+                            name: tactic.name,
+                            description: tactic.description || ''
+                        });
+                    }
+                }
+                console.log(`Loaded ${this.tactics.size} tactics from tactics array`);
             }
             
-            console.log(`✅ Loaded ${this.techniques.size} MITRE techniques and ${this.tactics.size} tactics`);
+            // Load techniques and extract additional tactics
+            if (mitreData.techniques && Array.isArray(mitreData.techniques)) {
+                for (const technique of mitreData.techniques) {
+                    if (technique.id && technique.name && Array.isArray(technique.tactics)) {
+                        this.techniques.set(technique.id, {
+                            id: technique.id,
+                            name: technique.name,
+                            tactics: technique.tactics,
+                            description: technique.description,
+                            parent: technique.parent
+                        });
+                        
+                        // Also collect tactics from techniques as secondary source
+                        technique.tactics.forEach((tactic: string) => {
+                            if (!this.tactics.has(tactic)) {
+                                this.tactics.add(tactic);
+                                // Add basic tactic info if not already loaded
+                                if (!this.tacticDetails.has(tactic)) {
+                                    this.tacticDetails.set(tactic, {
+                                        id: '',
+                                        name: tactic,
+                                        description: `MITRE ATT&CK Tactic: ${tactic}`
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }
+                console.log(`Loaded ${this.techniques.size} techniques`);
+            }
+            
+            console.log(`✅ MITRE data loaded: ${this.techniques.size} techniques, ${this.tactics.size} tactics`);
         } catch (error) {
-            console.warn('Could not load MITRE data from embedded file, using fallback:', error);
-            this.loadFallbackData();
+            console.error('Failed to parse MITRE data:', error);
+            throw error;
         }
     }
 
-    private static loadFallbackData(): void {
-        // Updated fallback tactics for 2025 - based on MITRE ATT&CK v15/v16
+    private static loadFallbackData() {
+        console.log('Loading fallback MITRE data...');
+        
+        // Fallback tactics from MITRE ATT&CK framework
         const fallbackTactics = [
-            'Reconnaissance',           // TA0043
-            'ResourceDevelopment',      // TA0042
-            'InitialAccess',           // TA0001
-            'Execution',               // TA0002
-            'Persistence',             // TA0003
-            'PrivilegeEscalation',     // TA0004
-            'DefenseEvasion',          // TA0005
-            'CredentialAccess',        // TA0006
-            'Discovery',               // TA0007
-            'LateralMovement',         // TA0008
-            'Collection',              // TA0009
-            'CommandAndControl',       // TA0011
-            'Exfiltration',            // TA0010
-            'Impact'                   // TA0040
+            'Reconnaissance', 'ResourceDevelopment', 'InitialAccess', 'Execution', 
+            'Persistence', 'PrivilegeEscalation', 'DefenseEvasion', 'CredentialAccess',
+            'Discovery', 'LateralMovement', 'Collection', 'CommandAndControl', 
+            'Exfiltration', 'Impact'
         ];
         
         this.tactics.clear();
-        fallbackTactics.forEach(tactic => this.tactics.add(tactic));
+        this.tacticDetails.clear();
+        fallbackTactics.forEach(tactic => {
+            this.tactics.add(tactic);
+            this.tacticDetails.set(tactic, {
+                id: '',
+                name: tactic,
+                description: `MITRE ATT&CK Tactic: ${tactic}`
+            });
+        });
         
         console.log(`Loaded ${fallbackTactics.length} fallback MITRE tactics`);
     }
@@ -88,12 +139,30 @@ export class MitreLoader {
         return Array.from(this.tactics);
     }
 
+    public static getAllTactics(): MitreTactic[] {
+        return Array.from(this.tacticDetails.values());
+    }
+
+    public static getAllTechniques(): MitreTechnique[] {
+        return Array.from(this.techniques.values());
+    }
+
+    public static getTechniquesForTactic(tactic: string): MitreTechnique[] {
+        return Array.from(this.techniques.values()).filter(technique => 
+            technique.tactics.includes(tactic)
+        );
+    }
+
     public static isValidTechnique(technique: string): boolean {
         return this.techniques.has(technique);
     }
 
     public static getTechnique(id: string): MitreTechnique | undefined {
         return this.techniques.get(id);
+    }
+
+    public static getTacticDetails(name: string): MitreTactic | undefined {
+        return this.tacticDetails.get(name);
     }
 
     public static validateTactic(tactic: string): {
@@ -117,7 +186,7 @@ export class MitreLoader {
             return {
                 isKnown: false,
                 isValidFormat: false,
-                message: `Invalid tactic format '${tactic}'. Expected PascalCase format (e.g., 'InitialAccess').`,
+                message: `Tactic '${tactic}' has invalid format. Should start with uppercase letter and contain only letters.`,
                 severity: vscode.DiagnosticSeverity.Error
             };
         }
@@ -126,25 +195,25 @@ export class MitreLoader {
             return {
                 isKnown: false,
                 isValidFormat: true,
-                message: `Unknown tactic '${tactic}'. Strict validation requires tactics to be in loaded MITRE data.`,
+                message: `Unknown tactic '${tactic}'. Enable 'Allow Unknown Tactics' or use a known MITRE tactic.`,
                 severity: vscode.DiagnosticSeverity.Error
             };
         }
 
-        if (allowUnknown) {
+        if (!allowUnknown) {
             return {
                 isKnown: false,
                 isValidFormat: true,
-                message: `Tactic '${tactic}' not found in loaded MITRE data. Please verify this is a valid MITRE tactic.`,
-                severity: vscode.DiagnosticSeverity.Information
+                message: `Unknown tactic '${tactic}'. Consider using a known MITRE tactic.`,
+                severity: vscode.DiagnosticSeverity.Warning
             };
         }
 
         return {
             isKnown: false,
             isValidFormat: true,
-            message: `Unknown tactic '${tactic}'. Consider updating MITRE data or enabling 'allowUnknownTactics'.`,
-            severity: vscode.DiagnosticSeverity.Warning
+            message: `Custom tactic '${tactic}' (not in MITRE ATT&CK framework)`,
+            severity: vscode.DiagnosticSeverity.Information
         };
     }
 
@@ -159,7 +228,7 @@ export class MitreLoader {
         const strictValidation = config.get('mitre.strictValidation', false);
 
         const isKnown = this.techniques.has(technique);
-        const isValidFormat = /^T[0-9]{4}(\.[0-9]{3})?$/.test(technique);
+        const isValidFormat = /^T\d{4}(\.\d{3})?$/.test(technique);
 
         if (isKnown) {
             return { isKnown: true, isValidFormat: true, severity: vscode.DiagnosticSeverity.Information };
@@ -169,7 +238,7 @@ export class MitreLoader {
             return {
                 isKnown: false,
                 isValidFormat: false,
-                message: `Invalid technique format '${technique}'. Expected format: T#### or T####.### (e.g., 'T1566.001').`,
+                message: `Technique '${technique}' has invalid format. Should be T#### or T####.### (e.g., T1566 or T1566.001)`,
                 severity: vscode.DiagnosticSeverity.Error
             };
         }
@@ -178,25 +247,25 @@ export class MitreLoader {
             return {
                 isKnown: false,
                 isValidFormat: true,
-                message: `Unknown technique '${technique}'. Strict validation requires techniques to be in loaded MITRE data.`,
+                message: `Unknown technique '${technique}'. Enable 'Allow Unknown Techniques' or use a known MITRE technique.`,
                 severity: vscode.DiagnosticSeverity.Error
             };
         }
 
-        if (allowUnknown) {
+        if (!allowUnknown) {
             return {
                 isKnown: false,
                 isValidFormat: true,
-                message: `Technique '${technique}' not found in loaded MITRE data. Please verify this technique ID exists.`,
-                severity: vscode.DiagnosticSeverity.Information
+                message: `Unknown technique '${technique}'. Consider using a known MITRE technique.`,
+                severity: vscode.DiagnosticSeverity.Warning
             };
         }
 
         return {
             isKnown: false,
             isValidFormat: true,
-            message: `Unknown technique '${technique}'. Consider updating MITRE data or enabling 'allowUnknownTechniques'.`,
-            severity: vscode.DiagnosticSeverity.Warning
+            message: `Custom technique '${technique}' (not in MITRE ATT&CK framework)`,
+            severity: vscode.DiagnosticSeverity.Information
         };
     }
 }
