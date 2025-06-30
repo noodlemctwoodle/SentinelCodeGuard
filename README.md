@@ -185,7 +185,7 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 - **Performance Optimizations** and cleaner packaging
 - **Better Validation** with enhanced MITRE ATT&CK support
 
-[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
+[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/CHANGELOG)
 
 ---
 
