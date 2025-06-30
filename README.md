@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.6-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.7-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **Development toolkit for Microsoft Sentinel Analytics Rules**
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.6).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.7).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -177,6 +177,12 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 
 ## 📈 Recent Updates
 
+### v0.0.7 (2025-01-01)
+
+- **Fixed Documentation Links** - Resolved 404 errors in README.md
+- **Updated Microsoft Documentation URLs** - Migrated to learn.microsoft.com
+- **Improved Contributing Information** - Streamlined contribution process
+
 ### v0.0.6 (2025-06-25)
 
 - **Enhanced ARM Conversion** with improved field mapping
@@ -185,13 +191,13 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 - **Performance Optimizations** and cleaner packaging
 - **Better Validation** with enhanced MITRE ATT&CK support
 
-[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CHANGELOG.md)
+[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Contributing Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CONTRIBUTING.md) for details.
+We welcome contributions! Please submit issues and feature requests via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 1. Fork the repository
 2. Create a feature branch
@@ -202,16 +208,16 @@ We welcome contributions! See our [Contributing Guide](https://github.com/noodle
 
 ## 📄 License
 
-MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE.txt) for details.
 
 ---
 
 ## 🔗 Resources
 
 - **[Wiki Documentation](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature guides
-- **[Microsoft Sentinel Docs](https://docs.microsoft.com/azure/sentinel/)** - Official documentation
+- **[Microsoft Sentinel Docs](https://learn.microsoft.com/en-us/azure/sentinel/)** - Official documentation
 - **[MITRE ATT&CK](https://attack.mitre.org/)** - Framework reference
-- **[KQL Reference](https://docs.microsoft.com/azure/data-explorer/kusto/query/)** - Query language docs
+- **[KQL Reference](https://learn.microsoft.com/en-us/azure/data-explorer/kusto/query/)** - Query language docs
 - **[sentinel.blog](https://sentinel.blog)** - Additional tutorials and insights
 
 ---
