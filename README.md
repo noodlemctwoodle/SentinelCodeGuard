@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.7-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.6-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **Development toolkit for Microsoft Sentinel Analytics Rules**
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.7).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.6).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -176,12 +176,6 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 ---
 
 ## 📈 Recent Updates
-
-### v0.0.7 (2025-01-01)
-
-- **Fixed Documentation Links** - Resolved 404 errors in README.md
-- **Updated Microsoft Documentation URLs** - Migrated to learn.microsoft.com
-- **Improved Contributing Information** - Streamlined contribution process
 
 ### v0.0.6 (2025-06-25)
 
