@@ -1,7 +1,5 @@
-# Microsoft Sentinel Analytics Rule - Near Real-Time Template
-
 id: {{GUID}}
-name: NRT Critical Alert Detection
+name: Microsoft Sentinel Analytics Rule - Near Real-Time Template
 description: |
   Identifies critical security events requiring immediate response using Near Real-Time processing.
   This template monitors privileged group modifications that could indicate privilege escalation attacks.
@@ -17,7 +15,7 @@ tactics:
   - PrivilegeEscalation
   - Impact
   - Persistence
-techniques:
+relevantTechniques:
   - T1078.003
   - T1098
   - T1484

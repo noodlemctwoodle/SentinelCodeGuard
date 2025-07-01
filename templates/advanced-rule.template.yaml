@@ -1,12 +1,9 @@
-# Microsoft Sentinel Analytics Rule - Advanced Template
-
 id: {{GUID}}
-name: Advanced Detection Rule
+name: Microsoft Sentinel Analytics Rule - Advanced Detection Rule Template
 description: |
   Identifies sophisticated attack patterns requiring detailed analysis and correlation.
   This advanced template includes comprehensive incident configuration and custom details.
 severity: High
-status: Available
 requiredDataConnectors:
   - connectorId: AzureActiveDirectory
     dataTypes:
@@ -19,11 +16,12 @@ queryFrequency: PT5M
 queryPeriod: PT1H
 triggerOperator: gt
 triggerThreshold: 5
+status: Available
 tactics:
   - InitialAccess
   - LateralMovement
   - PrivilegeEscalation
-techniques:
+relevantTechniques:
   - T1078
   - T1078.001
   - T1021
@@ -70,15 +68,19 @@ incidentConfiguration:
     reopenClosedIncident: false
     lookbackDuration: PT5H
     matchingMethod: AllEntities
-    groupByEntities: [Account, IP]
-    groupByAlertDetails: [DisplayName]
-    groupByCustomDetails: [RiskScore]
+    groupByEntities:
+      - Account
+      - IP
+    groupByAlertDetails:
+      - DisplayName
+    groupByCustomDetails:
+      - RiskScore
 eventGroupingSettings:
   aggregationKind: AlertPerResult
 suppressionDuration: PT5H
 suppressionEnabled: false
 alertDetailsOverride:
-  alertDisplayNameFormat: "Suspicious login activity for {{UserPrincipalName}} from {{UniqueIPs}} IP addresses"
+  alertDisplayNameFormat: Suspicious login activity for {{UserPrincipalName}} from {{UniqueIPs}} IP addresses
   alertDescriptionFormat: "User {{UserPrincipalName}} had {{FailedAttempts}} failed login attempts from {{UniqueIPs}} unique IP addresses with risk score: {{RiskScore}}"
   alertSeverityColumnName: RiskScore
 customDetails:

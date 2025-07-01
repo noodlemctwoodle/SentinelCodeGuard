@@ -1,12 +1,9 @@
-# Microsoft Sentinel Analytics Rule - Fallback Template
-
 id: {{GUID}}
-name: New Detection Rule
+name: Microsoft Sentinel Analytics Rule - Fall Back Template
 description: |
   Enter rule description here. This template was used as a fallback when the requested template could not be loaded.
   Please update all placeholder values with appropriate content for your specific detection scenario.
 severity: Medium
-status: Available
 requiredDataConnectors:
   - connectorId: AzureActiveDirectory
     dataTypes:
@@ -15,9 +12,10 @@ queryFrequency: PT5M
 queryPeriod: PT5M
 triggerOperator: gt
 triggerThreshold: 0
+status: Available
 tactics:
   - InitialAccess
-techniques:
+relevantTechniques:
   - T1078
 tags:
   - Detection

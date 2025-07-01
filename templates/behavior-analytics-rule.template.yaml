@@ -1,8 +1,5 @@
-# Microsoft Sentinel Analytics Rule - Anomaly Detection Template
-# Uses BehaviorAnalytics and IdentityInfo tables for anomaly detection
-
 id: {{GUID}}
-name: Anomalous User Behavior Detection
+name: Microsoft Sentinel Analytics Rule - Anomaly Detection Template
 description: |
   Detects users with anomalous behavior patterns based on Microsoft Sentinel behavior analytics data.
   This template identifies users with unusual activity patterns that may indicate compromise or insider threats.
@@ -23,7 +20,7 @@ tactics:
   - InitialAccess
   - DefenseEvasion
   - CredentialAccess
-techniques:
+relevantTechniques:
   - T1078
   - T1078.004
   - T1562
