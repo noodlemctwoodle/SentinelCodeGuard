@@ -84,7 +84,6 @@ export class SentinelCompletionProvider implements vscode.CompletionItemProvider
     
     private isTacticsContext(document: vscode.TextDocument, position: vscode.Position): boolean {
         const lineText = document.lineAt(position).text;
-        const text = document.getText();
         
         // Direct line detection
         if (lineText.includes('tactics:') || lineText.includes('tactics')) {
@@ -93,12 +92,6 @@ export class SentinelCompletionProvider implements vscode.CompletionItemProvider
         
         // Array item detection
         if (lineText.trim().startsWith('-') && this.isInSection(document, position, 'tactics')) {
-            return true;
-        }
-        
-        // Value position detection (after colon)
-        const beforeCursor = lineText.substring(0, position.character);
-        if (beforeCursor.includes('tactics:')) {
             return true;
         }
         

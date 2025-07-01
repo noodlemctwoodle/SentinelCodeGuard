@@ -6,7 +6,7 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
     public provideHover(
         document: vscode.TextDocument, 
         position: vscode.Position, 
-        token: vscode.CancellationToken
+        _token: vscode.CancellationToken
     ): vscode.ProviderResult<vscode.Hover> {
         
         // First, try to match MITRE technique IDs
@@ -114,7 +114,7 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
         
         // Description
         if (technique.description) {
-            let description = this.cleanDescription(technique.description);
+            const description = this.cleanDescription(technique.description);
             markdown.appendMarkdown(`**Description:**\n${description}\n\n`);
         }
         
@@ -142,7 +142,7 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
         
         // Description
         if (tactic.description) {
-            let description = this.cleanDescription(tactic.description);
+            const description = this.cleanDescription(tactic.description);
             markdown.appendMarkdown(`**Description:**\n${description}\n\n`);
         }
         
