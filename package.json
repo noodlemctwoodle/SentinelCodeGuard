@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
