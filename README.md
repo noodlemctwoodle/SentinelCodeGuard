@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.6-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.7-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **Development toolkit for Microsoft Sentinel Analytics Rules**
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.6).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.7).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -38,7 +38,7 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Content-based detection** - Automatically identifies Sentinel rules by analyzing YAML content
 - **Real-time validation** with instant feedback and error correction
 - **Professional templates** for all rule types (Standard, Advanced, NRT, Behavior Analytics)
-- **MITRE ATT&CK v16 validation** with auto-correction
+- **MITRE ATT&CK v16 validation** with auto-correction and hover information
 - **Smart IntelliSense** for all Sentinel fields and values
 
 ### 🔄 ARM Template Migration
@@ -51,10 +51,11 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ### 🛠️ Development Tools
 
-- **Professional formatting** with field reordering
-- **Live validation** in the Problems panel
+- **Professional formatting** with field reordering and duration auto-correction
+- **Live validation** in the Problems panel with rule-type-specific checks
 - **Code snippets** and auto-completion
 - **Entity mapping helpers** for all entity types
+- **MITRE ATT&CK hover provider** with detailed technique and tactic information
 - **Workspace integration** for team collaboration
 
 ---
@@ -76,7 +77,7 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 ### Convert ARM Templates
 
 1. **Right-click** any `.json` file containing ARM templates
-2. **Select**: "Convert ARM Template to YAML"
+2. **Select**: "Decompile ARM to YAML"
 3. **Choose naming strategy** and output location
 4. **Review conversion summary** with any warnings
 
@@ -114,9 +115,9 @@ Convert multiple rules from a single ARM template:
 
 **Input**: `SecurityRules.json` (5 rules) → **Output**: 5 separate YAML files
 
-- `Suspicious_Login_Activity.yaml`
-- `Data_Exfiltration_Alert.yaml`
-- `Privilege_Escalation.yaml`
+- `suspicious_login_activity.yaml`
+- `data_exfiltration_alert.yaml`
+- `privilege_escalation.yaml`
 - etc.
 
 ---
@@ -147,7 +148,7 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 | `Sentinel: Generate Advanced Rule Template` | Create complex detection rule |
 | `Sentinel: Generate NRT Rule Template` | Create near real-time rule |
 | `Sentinel: Generate Behavior Analytics Template` | Create ML-based rule |
-| `Sentinel: Convert ARM Template to YAML` | Convert ARM templates |
+| `Sentinel: Decompile ARM to YAML` | Convert ARM templates to YAML |
 | `Sentinel: Format Sentinel Rule` | Format and optimize structure |
 | `Sentinel: Validate All Workspace Rules` | Bulk validation |
 
@@ -176,6 +177,32 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 ---
 
 ## 📈 Recent Updates
+
+### v0.0.7 (2025-07-01)
+
+#### 🎯 Enhanced MITRE ATT&CK Integration
+- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
+- **Rich hover provider** for techniques and tactics with detailed information
+- **Context-aware hovers** that only trigger on actual MITRE fields
+- **Comprehensive technique/tactic validation** with auto-correction
+
+#### 🔧 Improved Formatting & Validation
+- **Rule-type-specific validation** for Scheduled vs NRT rules
+- **Enhanced duration handling** including `lookbackDuration` field support
+- **Better field ordering** with `lookbackDuration` positioned correctly
+- **Improved error handling** and YAML repair functionality
+
+#### 🔄 ARM Conversion Enhancements
+- **Renamed context menu** to "Decompile ARM to YAML" for clarity
+- **Lowercase filename generation** for consistency
+- **Improved command registration** and context menu integration
+- **Better error handling** during conversion process
+
+#### 🛠️ Developer Experience
+- **Cleaner validation logic** with unused imports removed
+- **Refactored required fields** logic for maintainability
+- **Enhanced TypeScript support** with proper type definitions
+- **Improved code organization** and documentation
 
 ### v0.0.6 (2025-06-25)
 
