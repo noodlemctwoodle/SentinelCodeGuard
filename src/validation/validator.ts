@@ -4,11 +4,11 @@ import { MitreLoader } from './mitreLoader';
 import { ConnectorLoader } from './connectorLoader';
 import { 
     VALID_SEVERITIES, 
-    VALID_ENTITY_TYPES, 
     EXPECTED_ORDER, 
-    REQUIRED_FIELDS,
+    getRequiredFieldsForKind,
     VALID_TRIGGER_OPERATORS,
     VALIDATION_PATTERNS,
+    VALID_ENTITY_TYPES,
     SENTINEL_RULE_INDICATORS,
     MIN_SENTINEL_INDICATORS
 } from './constants';
@@ -79,13 +79,17 @@ export class SentinelRuleValidator {
     }
 
     private validateRequiredFields(parsedYaml: any, lines: string[], errors: vscode.Diagnostic[]) {
-        for (const field of REQUIRED_FIELDS) {
+        // Get the rule kind, default to 'Scheduled' if not specified
+        const ruleKind = parsedYaml.kind || 'Scheduled';
+        const requiredFields = getRequiredFieldsForKind(ruleKind);
+        
+        for (const field of requiredFields) {
             if (!(field in parsedYaml)) {
                 // Add diagnostic at the end of the document
                 const lastLine = lines.length - 1;
                 errors.push(new vscode.Diagnostic(
                     new vscode.Range(lastLine, 0, lastLine, lines[lastLine]?.length || 0),
-                    `Missing required field: ${field}`,
+                    `Missing required field for ${ruleKind} rule: ${field}`,
                     vscode.DiagnosticSeverity.Error
                 ));
             }
@@ -155,7 +159,7 @@ export class SentinelRuleValidator {
     }
 
     private validateDurationFields(parsedYaml: any, lines: string[], errors: vscode.Diagnostic[]) {
-        const durationFields = ['queryFrequency', 'queryPeriod', 'suppressionDuration'];
+        const durationFields = ['queryFrequency', 'queryPeriod', 'suppressionDuration', 'lookbackDuration'];
         
         const validateDuration = (obj: any, path: string[] = []) => {
             if (typeof obj !== 'object' || obj === null) {

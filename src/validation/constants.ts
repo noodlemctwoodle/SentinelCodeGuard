@@ -106,20 +106,16 @@ export const EXPECTED_ORDER = [
 // ============================================================================
 // REQUIRED FIELDS
 // ============================================================================
-// Fields that must be present in every Sentinel Analytics Rule
-export const REQUIRED_FIELDS = [
+// Common fields required for all rule types
+export const COMMON_REQUIRED_FIELDS = [
     // Essential Identity
     'id',
     'name',
     'description',
     
-    // Rule Configuration (Required)
+    // Rule Configuration (Common)
     'severity',
     'requiredDataConnectors',
-    'queryFrequency',
-    'queryPeriod',
-    'triggerOperator',
-    'triggerThreshold',
     
     // MITRE Classification (Required)
     'tactics',
@@ -133,6 +129,42 @@ export const REQUIRED_FIELDS = [
     // Rule Metadata (Required)
     'version',
     'kind',
+];
+
+// Additional fields required specifically for Scheduled rules
+export const SCHEDULED_REQUIRED_FIELDS = [
+    'queryFrequency',
+    'queryPeriod',
+    'triggerOperator',
+    'triggerThreshold',
+];
+
+// Additional fields required specifically for NRT rules
+export const NRT_REQUIRED_FIELDS = [
+    // NRT rules don't require queryFrequency, queryPeriod, triggerOperator, or triggerThreshold
+];
+
+/**
+ * Get required fields for a specific rule kind
+ */
+export function getRequiredFieldsForKind(kind: string): string[] {
+    const commonFields = [...COMMON_REQUIRED_FIELDS];
+    
+    switch (kind?.toLowerCase()) {
+        case 'scheduled':
+            return [...commonFields, ...SCHEDULED_REQUIRED_FIELDS];
+        case 'nrt':
+            return [...commonFields, ...NRT_REQUIRED_FIELDS];
+        default:
+            // Default to Scheduled rules for unknown kinds
+            return [...commonFields, ...SCHEDULED_REQUIRED_FIELDS];
+    }
+}
+
+// Legacy export for backward compatibility (defaults to Scheduled rules)
+export const REQUIRED_FIELDS = [
+    ...COMMON_REQUIRED_FIELDS,
+    ...SCHEDULED_REQUIRED_FIELDS
 ];
 
 // ============================================================================
