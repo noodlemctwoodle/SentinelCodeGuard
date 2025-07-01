@@ -116,7 +116,7 @@
       },
       {
         "command": "sentinelRules.convertArmToYaml",
-        "title": "Convert ARM Template to YAML",
+        "title": "Decompile ARM to YAML",
         "category": "Sentinel Rules"
       }
     ],
@@ -133,7 +133,7 @@
           "group": "sentinel@2"
         },
         {
-          "when": "resourceExtname == .json",
+          "when": "resourceExtname == .json && config.sentinelRules.conversion.enabled",
           "command": "sentinelRules.convertArmToYaml",
           "group": "sentinel@3"
         }
@@ -143,6 +143,11 @@
           "when": "explorerResourceIsFolder",
           "command": "sentinelRules.generateTemplate",
           "group": "sentinel@1"
+        },
+        {
+          "when": "resourceExtname == .json && config.sentinelRules.conversion.enabled",
+          "command": "sentinelRules.convertArmToYaml",
+          "group": "sentinel@3"
         }
       ],
       "commandPalette": [
@@ -161,7 +166,8 @@
           "command": "sentinelRules.validateWorkspace"
         },
         {
-          "command": "sentinelRules.convertArmToYaml"
+          "command": "sentinelRules.convertArmToYaml",
+          "when": "config.sentinelRules.conversion.enabled"
         }
       ]
     },
