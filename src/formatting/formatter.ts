@@ -253,7 +253,7 @@ kind: Scheduled
                 return;
             }
 
-            const durationFields = ['queryFrequency', 'queryPeriod', 'suppressionDuration'];
+            const durationFields = ['queryFrequency', 'queryPeriod', 'suppressionDuration', 'lookbackDuration'];
 
             for (const [key, value] of Object.entries(obj)) {
                 const currentPath = [...path, key];

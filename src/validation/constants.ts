@@ -91,6 +91,7 @@ export const EXPECTED_ORDER = [
     'entityMappings',
     'incidentConfiguration',
     'eventGroupingSettings',
+    'lookbackDuration',
     
     // Suppression & Alerts
     'suppressionDuration',
