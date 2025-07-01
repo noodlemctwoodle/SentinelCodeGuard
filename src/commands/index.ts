@@ -29,27 +29,27 @@ export class CommandManager {
         // Template generation commands
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.generateTemplate', (uri?: vscode.Uri) => 
-                this.generateTemplate('standard-rule', 'standard-rule.sentinel.yaml', uri))
+                this.generateTemplate('standard-rule', 'standard_sentinel_rule.yaml', uri))
         );
 
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.generateAdvancedTemplate', (uri?: vscode.Uri) => 
-                this.generateTemplate('advanced-rule', 'advanced-rule.sentinel.yaml', uri))
+                this.generateTemplate('advanced-rule', 'advanced_sentinel_rule.yaml', uri))
         );
 
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.generateNRTTemplate', (uri?: vscode.Uri) => 
-                this.generateTemplate('nrt-rule', 'nrt-rule.sentinel.yaml', uri))
+                this.generateTemplate('nrt-rule', 'nrt_sentinel_rule.yaml', uri))
         );
 
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.generateBehaviorAnalyticsTemplate', (uri?: vscode.Uri) => 
-                this.generateTemplate('behavior-analytics-rule', 'behavior-analytics-rule.sentinel.yaml', uri))
+                this.generateTemplate('behavior-analytics-rule', 'anomaly_sentinel_rule.yaml', uri))
         );
 
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.generateMinimalTemplate', (uri?: vscode.Uri) => 
-                this.generateTemplate('minimal-rule', 'minimal-rule.sentinel.yaml', uri))
+                this.generateTemplate('minimal-rule', 'minimal_sentinel_rule.yaml', uri))
         );
 
         // ARM to YAML conversion commands
