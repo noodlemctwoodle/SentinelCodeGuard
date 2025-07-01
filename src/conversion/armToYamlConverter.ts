@@ -219,7 +219,7 @@ export class ArmToYamlConverter {
             case 'ruleId': {
                 // Extract GUID from resource name if possible, otherwise generate new one
                 const guidMatch = resourceName.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
-                baseName = guidMatch ? guidMatch[0] : uuidv4();
+                baseName = guidMatch ? guidMatch[0].toLowerCase() : uuidv4(); // Convert GUID to lowercase
                 break;
             }
             case 'original':
@@ -535,12 +535,13 @@ export class ArmToYamlConverter {
     }
 
     private static sanitizeFileName(name: string): string {
-        // Remove invalid filename characters and replace with underscores
+        // Remove invalid filename characters and replace with underscores, then convert to lowercase
         return name
             .replace(/[<>:"/\\|?*]/g, '_')
             .replace(/\s+/g, '_')
             .replace(/_+/g, '_')
             .replace(/^_|_$/g, '')
+            .toLowerCase()                    // Convert to lowercase
             .substring(0, 100); // Limit length
     }
 }
