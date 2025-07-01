@@ -16,21 +16,48 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
             return this.createTechniqueHover(techniqueId, wordRange);
         }
         
-        // Then try to match tactic names (handle YAML array context)
-        const line = document.lineAt(position.line).text;
-        const linePrefix = line.substring(0, position.character);
-        
-        // Check if we're in a tactics array context
-        if (line.includes('tactics:') || linePrefix.includes('- ')) {
-            // Get word at position for tactics
+        // Then try to match tactic names, but only in the right context
+        const mitreContext = this.getMitreContext(document, position);
+        if (mitreContext) {
             wordRange = document.getWordRangeAtPosition(position, /[A-Z][a-zA-Z]+/);
             if (wordRange) {
                 const tacticName = document.getText(wordRange);
-                return this.createTacticHover(tacticName, wordRange);
+                
+                // Only provide hover for tactics context, not techniques
+                if (mitreContext === 'tactics') {
+                    return this.createTacticHover(tacticName, wordRange);
+                }
             }
         }
         
         return undefined;
+    }
+    
+    /**
+     * Determines if the current position is within a MITRE-related YAML section
+     * Returns 'tactics', 'techniques', or null
+     */
+    private getMitreContext(document: vscode.TextDocument, position: vscode.Position): string | null {
+        // Look backwards from current position to find the relevant YAML section
+        for (let i = position.line; i >= 0; i--) {
+            const line = document.lineAt(i).text;
+            const trimmedLine = line.trim();
+            
+            // If we hit another top-level field (not indented), we're outside the MITRE context
+            if (i < position.line && /^[a-zA-Z]/.test(trimmedLine) && !trimmedLine.startsWith('tactics:') && !trimmedLine.startsWith('techniques:')) {
+                break;
+            }
+            
+            // Check for MITRE section headers
+            if (trimmedLine === 'tactics:' || trimmedLine.startsWith('tactics:')) {
+                return 'tactics';
+            }
+            if (trimmedLine === 'techniques:' || trimmedLine.startsWith('techniques:')) {
+                return 'techniques';
+            }
+        }
+        
+        return null;
     }
     
     private createTechniqueHover(techniqueId: string, wordRange: vscode.Range): vscode.Hover | undefined {
@@ -57,14 +84,8 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
     private createTacticHover(tacticName: string, wordRange: vscode.Range): vscode.Hover | undefined {
         const tacticDetails = MitreLoader.getTacticDetails(tacticName);
         if (!tacticDetails) {
-            return new vscode.Hover(
-                new vscode.MarkdownString(`**MITRE ATT&CK Tactic**\n\n` +
-                    `**Name:** ${tacticName}\n\n` +
-                    `*Tactic not found in loaded MITRE dataset*\n\n` +
-                    `[View MITRE ATT&CK Tactics](https://attack.mitre.org/tactics/enterprise/)`
-                ),
-                wordRange
-            );
+            // Don't show hover for unrecognized tactic names to avoid false positives
+            return undefined;
         }
         
         return new vscode.Hover(this.createTacticHoverContent(tacticDetails), wordRange);
