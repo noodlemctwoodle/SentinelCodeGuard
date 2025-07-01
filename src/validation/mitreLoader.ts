@@ -15,6 +15,28 @@ interface MitreTactic {
     description: string;
 }
 
+// STIX format interfaces for the complete dataset
+interface StixObject {
+    type: string;
+    id: string;
+    name?: string;
+    description?: string;
+    external_references?: Array<{
+        source_name: string;
+        external_id: string;
+    }>;
+    kill_chain_phases?: Array<{
+        kill_chain_name: string;
+        phase_name: string;
+    }>;
+    x_mitre_is_subtechnique?: boolean;
+}
+
+interface StixBundle {
+    type: string;
+    objects: StixObject[];
+}
+
 export class MitreLoader {
     private static techniques: Map<string, MitreTechnique> = new Map();
     private static tactics: Set<string> = new Set();
@@ -27,93 +49,122 @@ export class MitreLoader {
 
     public static async loadMitreData(): Promise<void> {
         try {
-            // Load from configuration or remote source
+            // Load from configuration
             const config = vscode.workspace.getConfiguration('sentinelRules');
             const mitreVersion = config.get('mitre.version', 'v16');
             
-            // Load from embedded JSON file
-            await this.loadFromEmbeddedData(mitreVersion);
+            // Load the complete STIX dataset
+            const loaded = await this.loadFromEmbeddedData(mitreVersion);
+            
+            if (!loaded) {
+                // Only fallback to hardcoded basics if file completely missing
+                this.loadFallbackData();
+            }
         } catch (error) {
             console.error('Failed to load MITRE data:', error);
-            // Fallback to basic tactics
             this.loadFallbackData();
         }
     }
 
-    private static async loadFromEmbeddedData(version: string): Promise<void> {
+    private static async loadFromEmbeddedData(version: string): Promise<boolean> {
         try {
             if (!this.extensionContext) {
                 throw new Error('Extension context not set');
             }
 
-            // Use extension context instead of vscode.extensions.getExtension()
+            // Load the main MITRE dataset (complete STIX format)
             const mitreDataPath = path.join(this.extensionContext.extensionPath, 'data', `mitre-${version}.json`);
             const mitreDataUri = vscode.Uri.file(mitreDataPath);
             
             const data = await vscode.workspace.fs.readFile(mitreDataUri);
-            const mitreData = JSON.parse(data.toString());
+            const stixBundle: StixBundle = JSON.parse(data.toString());
             
+            if (stixBundle.type !== 'bundle' || !stixBundle.objects) {
+                throw new Error('Invalid STIX bundle format');
+            }
+
             this.techniques.clear();
             this.tactics.clear();
             this.tacticDetails.clear();
             
-            // Load tactics from the tactics array first (primary source)
-            if (mitreData.tactics && Array.isArray(mitreData.tactics)) {
-                for (const tactic of mitreData.tactics) {
-                    if (tactic.name) {
-                        this.tactics.add(tactic.name);
-                        this.tacticDetails.set(tactic.name, {
-                            id: tactic.id,
-                            name: tactic.name,
-                            description: tactic.description || ''
-                        });
-                    }
+            // Extract tactics from STIX objects
+            const tacticObjects = stixBundle.objects.filter(obj => obj.type === 'x-mitre-tactic');
+            for (const tacticObj of tacticObjects) {
+                const externalRef = tacticObj.external_references?.find(ref => ref.source_name === 'mitre-attack');
+                if (externalRef && tacticObj.name) {
+                    const tacticName = this.formatTacticName(tacticObj.name);
+                    this.tactics.add(tacticName);
+                    this.tacticDetails.set(tacticName, {
+                        id: externalRef.external_id,
+                        name: tacticName,
+                        description: tacticObj.description || ''
+                    });
                 }
-                console.log(`Loaded ${this.tactics.size} tactics from tactics array`);
             }
+
+            // Extract techniques from STIX objects
+            const techniqueObjects = stixBundle.objects.filter(obj => 
+                obj.type === 'attack-pattern' && 
+                obj.external_references?.some(ref => ref.source_name === 'mitre-attack')
+            );
             
-            // Load techniques and extract additional tactics
-            if (mitreData.techniques && Array.isArray(mitreData.techniques)) {
-                for (const technique of mitreData.techniques) {
-                    if (technique.id && technique.name && Array.isArray(technique.tactics)) {
-                        this.techniques.set(technique.id, {
-                            id: technique.id,
-                            name: technique.name,
-                            tactics: technique.tactics,
-                            description: technique.description,
-                            parent: technique.parent
-                        });
-                        
-                        // Also collect tactics from techniques as secondary source
-                        technique.tactics.forEach((tactic: string) => {
-                            if (!this.tactics.has(tactic)) {
-                                this.tactics.add(tactic);
-                                // Add basic tactic info if not already loaded
-                                if (!this.tacticDetails.has(tactic)) {
-                                    this.tacticDetails.set(tactic, {
-                                        id: '',
-                                        name: tactic,
-                                        description: `MITRE ATT&CK Tactic: ${tactic}`
-                                    });
-                                }
+            for (const techniqueObj of techniqueObjects) {
+                const externalRef = techniqueObj.external_references?.find(ref => ref.source_name === 'mitre-attack');
+                if (externalRef && techniqueObj.name) {
+                    const tactics = techniqueObj.kill_chain_phases
+                        ?.filter(phase => phase.kill_chain_name === 'mitre-attack')
+                        .map(phase => this.formatTacticName(phase.phase_name.replace(/-/g, ' '))) || [];
+
+                    const isSubTechnique = techniqueObj.x_mitre_is_subtechnique === true;
+                    const techniqueId = externalRef.external_id;
+                    
+                    this.techniques.set(techniqueId, {
+                        id: techniqueId,
+                        name: techniqueObj.name,
+                        tactics: tactics,
+                        description: techniqueObj.description,
+                        parent: isSubTechnique ? techniqueId.split('.')[0] : undefined
+                    });
+
+                    // Add tactics to the tactics set if not already present
+                    tactics.forEach(tactic => {
+                        if (!this.tactics.has(tactic)) {
+                            this.tactics.add(tactic);
+                            if (!this.tacticDetails.has(tactic)) {
+                                this.tacticDetails.set(tactic, {
+                                    id: '',
+                                    name: tactic,
+                                    description: `MITRE ATT&CK Tactic: ${tactic}`
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
-                console.log(`Loaded ${this.techniques.size} techniques`);
             }
-            
-            console.log(`✅ MITRE data loaded: ${this.techniques.size} techniques, ${this.tactics.size} tactics`);
+
+            console.log(`✅ Loaded complete MITRE ATT&CK dataset: ${this.tactics.size} tactics, ${this.techniques.size} techniques`);
+            return true;
+
         } catch (error) {
-            console.error('Failed to parse MITRE data:', error);
-            throw error;
+            console.error('Failed to load MITRE dataset:', error);
+            return false;
         }
     }
 
+    private static formatTacticName(tacticName: string): string {
+        // Convert tactic names to Sentinel format
+        // "initial-access" -> "InitialAccess"
+        // "privilege-escalation" -> "PrivilegeEscalation"
+        return tacticName
+            .split(/[-\s]+/)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join('');
+    }
+
     private static loadFallbackData() {
-        console.log('Loading fallback MITRE data...');
+        console.log('⚠️  Loading minimal fallback MITRE data...');
         
-        // Fallback tactics from MITRE ATT&CK framework
+        // Minimal fallback tactics from MITRE ATT&CK framework
         const fallbackTactics = [
             'Reconnaissance', 'ResourceDevelopment', 'InitialAccess', 'Execution', 
             'Persistence', 'PrivilegeEscalation', 'DefenseEvasion', 'CredentialAccess',
@@ -123,6 +174,8 @@ export class MitreLoader {
         
         this.tactics.clear();
         this.tacticDetails.clear();
+        this.techniques.clear();
+        
         fallbackTactics.forEach(tactic => {
             this.tactics.add(tactic);
             this.tacticDetails.set(tactic, {
@@ -132,7 +185,7 @@ export class MitreLoader {
             });
         });
         
-        console.log(`Loaded ${fallbackTactics.length} fallback MITRE tactics`);
+        console.log(`Loaded ${fallbackTactics.length} fallback tactics (techniques unavailable)`);
     }
 
     public static getValidTactics(): string[] {
