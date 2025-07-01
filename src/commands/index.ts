@@ -172,6 +172,10 @@ export class CommandManager {
         try {
             await vscode.workspace.fs.writeFile(targetUri, Buffer.from(template, 'utf8'));
             const document = await vscode.workspace.openTextDocument(targetUri);
+            
+            // Explicitly set language to YAML to prevent auto-detection of custom language
+            await vscode.languages.setTextDocumentLanguage(document, 'yaml');
+            
             await vscode.window.showTextDocument(document);
             vscode.window.showInformationMessage(`New ${defaultFilename} template created!`);
         } catch (error) {
