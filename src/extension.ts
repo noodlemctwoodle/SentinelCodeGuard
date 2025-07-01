@@ -7,6 +7,7 @@ import { DocumentListenerManager } from './listeners/documentListeners';
 import { MitreLoader } from './validation/mitreLoader';
 import { ConnectorLoader } from './validation/connectorLoader';
 import { SentinelCompletionProvider } from './providers/completionProvider';
+import { SentinelRuleHoverProvider } from './providers/hoverProvider';
 
 function getErrorMessage(error: unknown): string {
     if (error instanceof Error) {
@@ -63,7 +64,14 @@ export async function activate(context: vscode.ExtensionContext) {
             new SentinelCompletionProvider(),
             ':', '"', "'"  // Trigger characters
         );
-        context.subscriptions.push(completionProvider);
+        
+        // Register hover provider for MITRE techniques and tactics
+        const hoverProvider = vscode.languages.registerHoverProvider(
+            { scheme: 'file', language: 'yaml' },
+            new SentinelRuleHoverProvider()
+        );
+        
+        context.subscriptions.push(completionProvider, hoverProvider);
 
         // Add all disposables to context subscriptions
         context.subscriptions.push(
