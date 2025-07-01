@@ -1,52 +1,71 @@
 # Microsoft Sentinel Analytics Rule - Standard Template
 
-id: "{{GUID}}"
-name: "New Detection Rule"
+id: {{GUID}}
+name: New Detection Rule
 description: |
   Identifies suspicious activity that requires investigation.
-  This is a standard template with common detection fields.
-severity: "Medium"
-status: "Available"
+  This is a standard template with common detection fields for general-purpose security monitoring.
+severity: Medium
+status: Available
 requiredDataConnectors:
-  - connectorId: "AzureActiveDirectory"
+  - connectorId: AzureActiveDirectory
     dataTypes:
-      - "SigninLogs"
-queryFrequency: "PT5M"
-queryPeriod: "P1D"
-triggerOperator: "gt"
+      - SigninLogs
+queryFrequency: PT5M
+queryPeriod: P1D
+triggerOperator: gt
 triggerThreshold: 0
 tactics:
-  - "InitialAccess"
+  - InitialAccess
 techniques:
-  - "T1078"
+  - T1078
 tags:
-  - "SecurityOps"
+  - SecurityOps
 query: |
   SigninLogs
   | where TimeGenerated >= ago(1d)
   | where ResultType != 0
-  | summarize FailedAttempts = count() by UserPrincipalName, IPAddress
+  | summarize 
+      FailedAttempts = count(),
+      UniqueIPs = dcount(IPAddress),
+      Countries = make_set(LocationDetails.countryOrRegion),
+      FirstFailure = min(TimeGenerated),
+      LastFailure = max(TimeGenerated)
+    by UserPrincipalName, IPAddress
   | where FailedAttempts > 5
-  | extend LastFailedLogin = now()
+  | extend 
+      RiskScore = case(
+          UniqueIPs > 3, "High",
+          UniqueIPs > 1, "Medium",
+          "Low"
+      ),
+      TimeWindow = LastFailure - FirstFailure
+  | project-reorder 
+      LastFailure, 
+      UserPrincipalName, 
+      IPAddress, 
+      FailedAttempts, 
+      RiskScore, 
+      Countries
 entityMappings:
-  - entityType: "Account"
+  - entityType: Account
     fieldMappings:
-      - identifier: "FullName"
-        columnName: "UserPrincipalName"
-  - entityType: "IP"
+      - identifier: FullName
+        columnName: UserPrincipalName
+  - entityType: IP
     fieldMappings:
-      - identifier: "Address"
-        columnName: "IPAddress"
+      - identifier: Address
+        columnName: IPAddress
 incidentConfiguration:
   createIncident: true
   groupingConfiguration:
     enabled: false
     reopenClosedIncident: false
-    lookbackDuration: "PT5H"
-    matchingMethod: "AllEntities"
+    lookbackDuration: PT5H
+    matchingMethod: AllEntities
 eventGroupingSettings:
-  aggregationKind: "SingleAlert"
-suppressionDuration: "PT5H"
+  aggregationKind: SingleAlert
+suppressionDuration: PT5H
 suppressionEnabled: false
-version: "1.0.0"
-kind: "Scheduled"
+version: 1.0.0
+kind: Scheduled

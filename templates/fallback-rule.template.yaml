@@ -1,38 +1,72 @@
 # Microsoft Sentinel Analytics Rule - Fallback Template
 
-id: "{{GUID}}"
-name: "New Detection Rule"
+id: {{GUID}}
+name: New Detection Rule
 description: |
   Enter rule description here. This template was used as a fallback when the requested template could not be loaded.
-  Please update all placeholder values with appropriate content.
-severity: "Medium"
-status: "Available"
+  Please update all placeholder values with appropriate content for your specific detection scenario.
+severity: Medium
+status: Available
 requiredDataConnectors:
-  - connectorId: "AzureActiveDirectory"
+  - connectorId: AzureActiveDirectory
     dataTypes:
-      - "SigninLogs"
-queryFrequency: "PT5M"
-queryPeriod: "PT5M"
-triggerOperator: "gt"
+      - SigninLogs
+queryFrequency: PT5M
+queryPeriod: PT5M
+triggerOperator: gt
 triggerThreshold: 0
 tactics:
-  - "InitialAccess"
+  - InitialAccess
 techniques:
-  - "T1078"
+  - T1078
 tags:
-  - "Detection"
+  - Detection
+  - Template
 query: |
   // Enter your KQL query here
-  // Example: Basic sign-in monitoring
+  // Example: Basic sign-in monitoring for failed logins
   SigninLogs
   | where TimeGenerated > ago(1h)
   | where ResultType != 0
-  | summarize FailedLogins = count() by UserPrincipalName
+  | summarize 
+      FailedLogins = count(),
+      UniqueIPs = dcount(IPAddress),
+      Countries = make_set(LocationDetails.countryOrRegion),
+      FirstFailure = min(TimeGenerated),
+      LastFailure = max(TimeGenerated)
+    by UserPrincipalName
   | where FailedLogins > 3
+  | extend 
+      TimeWindow = LastFailure - FirstFailure,
+      RiskScore = case(
+          UniqueIPs > 5, "High",
+          UniqueIPs > 2, "Medium", 
+          "Low"
+      )
+  | project-reorder 
+      LastFailure, 
+      UserPrincipalName, 
+      FailedLogins, 
+      RiskScore, 
+      UniqueIPs, 
+      Countries
 entityMappings:
-  - entityType: "Account"
+  - entityType: Account
     fieldMappings:
-      - identifier: "FullName"
-        columnName: "UserPrincipalName"
-version: "1.0.0"
-kind: "Scheduled"
+      - identifier: FullName
+        columnName: UserPrincipalName
+  - entityType: IP
+    fieldMappings:
+      - identifier: Address
+        columnName: UniqueIPs
+incidentConfiguration:
+  createIncident: true
+  groupingConfiguration:
+    enabled: false
+    reopenClosedIncident: false
+    lookbackDuration: PT5H
+    matchingMethod: AllEntities
+suppressionDuration: PT5H
+suppressionEnabled: false
+version: 1.0.0
+kind: Scheduled

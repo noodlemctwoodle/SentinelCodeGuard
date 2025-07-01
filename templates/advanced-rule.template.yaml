@@ -1,38 +1,38 @@
 # Microsoft Sentinel Analytics Rule - Advanced Template
 
-id: "{{GUID}}"
-name: "Advanced Detection Rule"
+id: {{GUID}}
+name: Advanced Detection Rule
 description: |
   Identifies sophisticated attack patterns requiring detailed analysis and correlation.
   This advanced template includes comprehensive incident configuration and custom details.
-severity: "High"
-status: "Available"
+severity: High
+status: Available
 requiredDataConnectors:
-  - connectorId: "AzureActiveDirectory"
+  - connectorId: AzureActiveDirectory
     dataTypes:
-      - "SigninLogs"
-      - "AuditLogs"
-  - connectorId: "SecurityEvents"
+      - SigninLogs
+      - AuditLogs
+  - connectorId: SecurityEvents
     dataTypes:
-      - "SecurityEvent"
-queryFrequency: "PT5M"
-queryPeriod: "PT1H"
-triggerOperator: "gt"
+      - SecurityEvent
+queryFrequency: PT5M
+queryPeriod: PT1H
+triggerOperator: gt
 triggerThreshold: 5
 tactics:
-  - "InitialAccess"
-  - "LateralMovement"
-  - "PrivilegeEscalation"
+  - InitialAccess
+  - LateralMovement
+  - PrivilegeEscalation
 techniques:
-  - "T1078"
-  - "T1078.001"
-  - "T1021"
-relevantTechniques:
-  - "T1110"
+  - T1078
+  - T1078.001
+  - T1021
+  - T1021.001
+  - T1110
 tags:
-  - "SecurityOps"
-  - "Advanced"
-  - "HighFidelity"
+  - SecurityOps
+  - Advanced
+  - HighFidelity
 query: |
   let timeRange = 1h;
   let threshold = 5;
@@ -53,40 +53,40 @@ query: |
       PrimaryIP = tostring(IPAddresses[0])
   | project TimeGenerated, UserPrincipalName, FailedAttempts, UniqueIPs, Countries, Apps, RiskScore, MultipleCountries, PrimaryIP
 entityMappings:
-  - entityType: "Account"
+  - entityType: Account
     fieldMappings:
-      - identifier: "FullName"
-        columnName: "UserPrincipalName"
-      - identifier: "Name"
-        columnName: "UserPrincipalName"
-  - entityType: "IP"
+      - identifier: FullName
+        columnName: UserPrincipalName
+      - identifier: Name
+        columnName: UserPrincipalName
+  - entityType: IP
     fieldMappings:
-      - identifier: "Address"
-        columnName: "PrimaryIP"
+      - identifier: Address
+        columnName: PrimaryIP
 incidentConfiguration:
   createIncident: true
   groupingConfiguration:
     enabled: true
     reopenClosedIncident: false
-    lookbackDuration: "PT5H"
-    matchingMethod: "AllEntities"
-    groupByEntities: ["Account", "IP"]
-    groupByAlertDetails: ["DisplayName"]
-    groupByCustomDetails: ["RiskScore"]
+    lookbackDuration: PT5H
+    matchingMethod: AllEntities
+    groupByEntities: [Account, IP]
+    groupByAlertDetails: [DisplayName]
+    groupByCustomDetails: [RiskScore]
 eventGroupingSettings:
-  aggregationKind: "AlertPerResult"
-suppressionDuration: "PT5H"
+  aggregationKind: AlertPerResult
+suppressionDuration: PT5H
 suppressionEnabled: false
 alertDetailsOverride:
   alertDisplayNameFormat: "Suspicious login activity for {{UserPrincipalName}} from {{UniqueIPs}} IP addresses"
   alertDescriptionFormat: "User {{UserPrincipalName}} had {{FailedAttempts}} failed login attempts from {{UniqueIPs}} unique IP addresses with risk score: {{RiskScore}}"
-  alertSeverityColumnName: "RiskScore"
+  alertSeverityColumnName: RiskScore
 customDetails:
-  FailedAttemptCount: "FailedAttempts"
-  UniqueIPCount: "UniqueIPs"
-  CountriesInvolved: "Countries"
-  ApplicationsTargeted: "Apps"
-  RiskAssessment: "RiskScore"
-  MultiCountryAccess: "MultipleCountries"
-version: "1.0.0"
-kind: "Scheduled"
+  FailedAttemptCount: FailedAttempts
+  UniqueIPCount: UniqueIPs
+  CountriesInvolved: Countries
+  ApplicationsTargeted: Apps
+  RiskAssessment: RiskScore
+  MultiCountryAccess: MultipleCountries
+version: 1.0.0
+kind: Scheduled

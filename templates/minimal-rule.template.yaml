@@ -1,26 +1,26 @@
 # Microsoft Sentinel Analytics Rule - Minimal Template
 
-id: "{{GUID}}"
-name: "New Detection Rule"
+id: {{GUID}}
+name: New Detection Rule
 description: |
   Identifies suspicious activity that requires investigation.
-  This is a minimal template with only the essential fields.
-severity: "Medium"
-status: "Available"
+  This is a minimal template with only the essential fields required for a Sentinel analytics rule.
+severity: Medium
+status: Available
 requiredDataConnectors:
-  - connectorId: "AzureActiveDirectory"
+  - connectorId: AzureActiveDirectory
     dataTypes:
-      - "SigninLogs"
-queryFrequency: "PT5M"
-queryPeriod: "PT1H"
-triggerOperator: "gt"
+      - SigninLogs
+queryFrequency: PT5M
+queryPeriod: PT1H
+triggerOperator: gt
 triggerThreshold: 0
 tactics:
-  - "InitialAccess"
+  - InitialAccess
 techniques:
-  - "T1078"
+  - T1078
 tags:
-  - "Detection"
+  - Detection
 query: |
   SigninLogs
   | where TimeGenerated >= ago(1h)
@@ -28,9 +28,9 @@ query: |
   | summarize FailedSignins = count() by UserPrincipalName
   | where FailedSignins > 3
 entityMappings:
-  - entityType: "Account"
+  - entityType: Account
     fieldMappings:
-      - identifier: "FullName"
-        columnName: "UserPrincipalName"
-version: "1.0.0"
-kind: "Scheduled"
+      - identifier: FullName
+        columnName: UserPrincipalName
+version: 1.0.0
+kind: Scheduled
