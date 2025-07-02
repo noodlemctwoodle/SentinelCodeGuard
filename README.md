@@ -60,6 +60,38 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ---
 
+## 📈 Recent Updates
+
+### v0.0.7 (2025-07-01)
+
+#### 🎯 Enhanced MITRE ATT&CK Integration
+- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
+- **Rich hover provider** for techniques and tactics with detailed information
+- **Context-aware hovers** that only trigger on actual MITRE fields
+- **Comprehensive technique/tactic validation** with auto-correction
+
+#### 🔧 Improved Formatting & Validation
+- **Rule-type-specific validation** for Scheduled vs NRT rules
+- **Enhanced duration handling** including `lookbackDuration` field support
+- **Better field ordering** with `lookbackDuration` positioned correctly
+- **Improved error handling** and YAML repair functionality
+
+#### 🔄 ARM Conversion Enhancements
+- **Renamed context menu** to "Decompile ARM to YAML" for clarity
+- **Lowercase filename generation** for consistency
+- **Improved command registration** and context menu integration
+- **Better error handling** during conversion process
+
+#### 🛠️ Developer Experience
+- **Cleaner validation logic** with unused imports removed
+- **Refactored required fields** logic for maintainability
+- **Enhanced TypeScript support** with proper type definitions
+- **Improved code organization** and documentation
+
+[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Change-Log)
+
+---
+
 ## 🚀 Quick Start
 
 ### Installation
@@ -93,7 +125,6 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 | **[Advanced](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#advanced-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Complex correlation | Senior analysts, threat hunters |
 | **[NRT](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#near-real-time-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | Real-time alerts | Critical asset monitoring |
 | **[Anomaly Detection](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#anomaly-detection-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Behavioural analysis | Advanced threat hunting |
-
 
 ---
 
@@ -169,50 +200,17 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 - **[GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues)** - Bug reports and feature requests
 - **[sentinel.blog](https://sentinel.blog)** - Additional resources and tutorials
 
+### Resources
 
-### Quick Fixes
-
-- **Extension not detecting files?** Ensure YAML contains 3+ Sentinel fields (`tactics`, `techniques`, `queryFrequency`, etc.)
-- **Commands missing?** Open any YAML file to activate the extension
-- **Validation issues?** Check Problems panel for detailed diagnostics
-
----
-
-## 📈 Recent Updates
-
-### v0.0.7 (2025-07-01)
-
-#### 🎯 Enhanced MITRE ATT&CK Integration
-- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
-- **Rich hover provider** for techniques and tactics with detailed information
-- **Context-aware hovers** that only trigger on actual MITRE fields
-- **Comprehensive technique/tactic validation** with auto-correction
-
-#### 🔧 Improved Formatting & Validation
-- **Rule-type-specific validation** for Scheduled vs NRT rules
-- **Enhanced duration handling** including `lookbackDuration` field support
-- **Better field ordering** with `lookbackDuration` positioned correctly
-- **Improved error handling** and YAML repair functionality
-
-#### 🔄 ARM Conversion Enhancements
-- **Renamed context menu** to "Decompile ARM to YAML" for clarity
-- **Lowercase filename generation** for consistency
-- **Improved command registration** and context menu integration
-- **Better error handling** during conversion process
-
-#### 🛠️ Developer Experience
-- **Cleaner validation logic** with unused imports removed
-- **Refactored required fields** logic for maintainability
-- **Enhanced TypeScript support** with proper type definitions
-- **Improved code organization** and documentation
-
-[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CHANGELOG.md)
+- **[Wiki Documentation](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature guides
+- **[Microsoft Sentinel Docs](https://docs.microsoft.com/azure/sentinel/)** - Official documentation
+- **[MITRE ATT&CK](https://attack.mitre.org/)** - Framework reference
+- **[KQL Reference](https://docs.microsoft.com/azure/data-explorer/kusto/query/)** - Query language docs
+- **[sentinel.blog](https://sentinel.blog)** - Additional tutorials and insights
 
 ---
 
 ## 🤝 Contributing
-
-We welcome contributions! See our [Contributing Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Change-Log) for details.
 
 1. Fork the repository
 2. Create a feature branch
@@ -224,16 +222,6 @@ We welcome contributions! See our [Contributing Guide](https://github.com/noodle
 ## 📄 License
 
 MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE.txt) for details.
-
----
-
-## 🔗 Resources
-
-- **[Wiki Documentation](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature guides
-- **[Microsoft Sentinel Docs](https://docs.microsoft.com/azure/sentinel/)** - Official documentation
-- **[MITRE ATT&CK](https://attack.mitre.org/)** - Framework reference
-- **[KQL Reference](https://docs.microsoft.com/azure/data-explorer/kusto/query/)** - Query language docs
-- **[sentinel.blog](https://sentinel.blog)** - Additional tutorials and insights
 
 ---
 
