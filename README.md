@@ -86,12 +86,14 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ## 📋 Available Templates
 
-| Template | Use Case | Documentation |
-|----------|----------|---------------|
-| **Standard** | General detection rules | [Standard Rule Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/StandardRuleTemplate) |
-| **Advanced** | Complex multi-stage detection | [Advanced Rule Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/AdvancedRuleTemplate) |
-| **NRT** | Near real-time alerts | [NRT Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/NearReal-Time(NRT)Template) |
-| **Behavior Analytics** | ML-based anomaly detection | [Behavior Analytics Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/BehaviorAnalyticsTemplate) |
+| Template | Complexity | Use Case | Target Audience |
+|----------|------------|----------|-----------------|
+| **[Minimal](#minimal-template)** | ![Low](https://img.shields.io/badge/complexity-low-green) | Quick prototyping | New users, rapid testing |
+| **[Standard](#standard-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | General detection | SOC analysts, security engineers |
+| **[Advanced](#advanced-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Complex correlation | Senior analysts, threat hunters |
+| **[NRT](#near-real-time-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | Real-time alerts | Critical asset monitoring |
+| **[Anomaly Detection](#anomaly-detection-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Behavioural analysis | Advanced threat hunting |
+
 
 ---
 
