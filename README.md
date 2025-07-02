@@ -87,10 +87,10 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Support for both extensions** (.yaml and .yml)
 - **Comprehensive template library** covering all Sentinel rule scenarios
 
+=======
 ### v0.0.7 (2025-07-01)
 
 #### 🎯 Enhanced MITRE ATT&CK Integration
-
 - **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
 - **Rich hover provider** for techniques and tactics with detailed information
 - **Context-aware hovers** that only trigger on actual MITRE fields
