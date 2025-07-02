@@ -163,7 +163,6 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 
 - **[Complete Wiki](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Comprehensive guides and examples
 - **[Troubleshooting](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide#-troubleshooting)** - Common issues and solutions
-- **[Configuration Help](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide)** - Setup and settings guidance
 
 ### Community
 
