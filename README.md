@@ -116,6 +116,20 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ---
 
+## 🔧 Commands
+
+| Command | Description |
+|---------|-------------|
+| `Sentinel Rules: Generate Standard Rule Template` | Create general-purpose rule |
+| `Sentinel Rules: Generate Advanced Rule Template` | Create complex detection rule |
+| `Sentinel Rules: Generate NRT Rule Template` | Create near real-time rule |
+| `Sentinel Rules: Generate Behavior Analytics Template` | Create ML-based rule |
+| `Sentinel Rules: Decompile ARM to YAML` | Convert ARM templates to YAML |
+| `Sentinel Rules: Format Sentinel Rule` | Format and optimise structure |
+| `Sentinel Rules: Validate All Workspace Rules` | Bulk validation |
+
+---
+
 ## 📋 Available Templates
 
 | Template | Complexity | Use Case | Target Audience |
@@ -171,20 +185,6 @@ Convert multiple rules from a single ARM template:
 ### Advanced Configuration
 
 For comprehensive configuration options, see: **[Configuration Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide#advanced-conversion-settings)**
-
----
-
-## 🔧 Commands
-
-| Command | Description |
-|---------|-------------|
-| `Sentinel Rules: Generate Standard Rule Template` | Create general-purpose rule |
-| `Sentinel Rules: Generate Advanced Rule Template` | Create complex detection rule |
-| `Sentinel Rules: Generate NRT Rule Template` | Create near real-time rule |
-| `Sentinel Rules: Generate Behavior Analytics Template` | Create ML-based rule |
-| `Sentinel Rules: Decompile ARM to YAML` | Convert ARM templates to YAML |
-| `Sentinel Rules: Format Sentinel Rule` | Format and optimise structure |
-| `Sentinel Rules: Validate All Workspace Rules` | Bulk validation |
 
 ---
 
