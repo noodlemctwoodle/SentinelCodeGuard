@@ -2,7 +2,7 @@
 
 ![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.7-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**Development toolkit for Microsoft Sentinel Analytics Rules**
+**A development toolkit for Microsoft Sentinel Analytics Rules**
 
 *Guard your Sentinel rules with precision*
 
@@ -144,13 +144,13 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 
 | Command | Description |
 |---------|-------------|
-| `Sentinel: Generate Standard Rule Template` | Create general-purpose rule |
-| `Sentinel: Generate Advanced Rule Template` | Create complex detection rule |
-| `Sentinel: Generate NRT Rule Template` | Create near real-time rule |
-| `Sentinel: Generate Behavior Analytics Template` | Create ML-based rule |
-| `Sentinel: Decompile ARM to YAML` | Convert ARM templates to YAML |
-| `Sentinel: Format Sentinel Rule` | Format and optimize structure |
-| `Sentinel: Validate All Workspace Rules` | Bulk validation |
+| `Sentinel Rules: Generate Standard Rule Template` | Create general-purpose rule |
+| `Sentinel Rules: Generate Advanced Rule Template` | Create complex detection rule |
+| `Sentinel Rules: Generate NRT Rule Template` | Create near real-time rule |
+| `Sentinel Rules: Generate Behavior Analytics Template` | Create ML-based rule |
+| `Sentinel Rules: Decompile ARM to YAML` | Convert ARM templates to YAML |
+| `Sentinel Rules: Format Sentinel Rule` | Format and optimise structure |
+| `Sentinel Rules: Validate All Workspace Rules` | Bulk validation |
 
 ---
 
@@ -159,14 +159,14 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 ### Documentation
 
 - **[Complete Wiki](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Comprehensive guides and examples
-- **[Troubleshooting](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki#-getting-help)** - Common issues and solutions
-- **[Configuration Help](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion/Configuration-Options#troubleshooting-configuration-issues)** - Setup and settings guidance
+- **[Troubleshooting](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide#-troubleshooting)** - Common issues and solutions
+- **[Configuration Help](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide)** - Setup and settings guidance
 
 ### Community
 
 - **[GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues)** - Bug reports and feature requests
-- **[Discussions](https://github.com/noodlemctwoodle/SentinelCodeGuard/discussions)** - Community support
 - **[sentinel.blog](https://sentinel.blog)** - Additional resources and tutorials
+
 
 ### Quick Fixes
 
@@ -204,21 +204,13 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 - **Enhanced TypeScript support** with proper type definitions
 - **Improved code organization** and documentation
 
-### v0.0.6 (2025-06-25)
-
-- **Enhanced ARM Conversion** with improved field mapping
-- **Comprehensive Wiki Documentation** with detailed guides
-- **Expanded Templates** including Behavior Analytics and NRT
-- **Performance Optimizations** and cleaner packaging
-- **Better Validation** with enhanced MITRE ATT&CK support
-
 [View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CHANGELOG.md)
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Contributing Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CONTRIBUTING.md) for details.
+We welcome contributions! See our [Contributing Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Change-Log) for details.
 
 1. Fork the repository
 2. Create a feature branch
@@ -229,7 +221,7 @@ We welcome contributions! See our [Contributing Guide](https://github.com/noodle
 
 ## 📄 License
 
-MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE.txt) for details.
 
 ---
 
@@ -243,4 +235,4 @@ MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard
 
 ---
 
-**SentinelCodeGuard** - Professional development toolkit for Microsoft Sentinel Analytics Rules
+**SentinelCodeGuard** - A development toolkit for Microsoft Sentinel Analytics Rules
