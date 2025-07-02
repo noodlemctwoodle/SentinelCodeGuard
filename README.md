@@ -190,23 +190,11 @@ For comprehensive configuration options, see: **[Configuration Guide](https://gi
 
 ## 🆘 Support & Troubleshooting
 
-### Documentation
-
-- **[Complete Wiki](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Comprehensive guides and examples
-- **[Troubleshooting](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide#-troubleshooting)** - Common issues and solutions
-
-### Community
-
-- **[GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues)** - Bug reports and feature requests
-- **[sentinel.blog](https://sentinel.blog)** - Additional resources and tutorials
-
 ### Resources
 
-- **[Wiki Documentation](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature guides
 - **[Microsoft Sentinel Docs](https://docs.microsoft.com/azure/sentinel/)** - Official documentation
 - **[MITRE ATT&CK](https://attack.mitre.org/)** - Framework reference
 - **[KQL Reference](https://docs.microsoft.com/azure/data-explorer/kusto/query/)** - Query language docs
-- **[sentinel.blog](https://sentinel.blog)** - Additional tutorials and insights
 
 ---
 
