@@ -88,11 +88,11 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 | Template | Complexity | Use Case | Target Audience |
 |----------|------------|----------|-----------------|
-| **[Minimal](#minimal-template)** | ![Low](https://img.shields.io/badge/complexity-low-green) | Quick prototyping | New users, rapid testing |
-| **[Standard](#standard-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | General detection | SOC analysts, security engineers |
-| **[Advanced](#advanced-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Complex correlation | Senior analysts, threat hunters |
-| **[NRT](#near-real-time-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | Real-time alerts | Critical asset monitoring |
-| **[Anomaly Detection](#anomaly-detection-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Behavioural analysis | Advanced threat hunting |
+| **[Minimal](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#minimal-template)** | ![Low](https://img.shields.io/badge/complexity-low-green) | Quick prototyping | New users, rapid testing |
+| **[Standard](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#standard-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | General detection | SOC analysts, security engineers |
+| **[Advanced](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#advanced-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Complex correlation | Senior analysts, threat hunters |
+| **[NRT](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#near-real-time-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | Real-time alerts | Critical asset monitoring |
+| **[Anomaly Detection](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#anomaly-detection-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Behavioural analysis | Advanced threat hunting |
 
 
 ---
