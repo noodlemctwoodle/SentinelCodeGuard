@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -85,6 +85,11 @@
         "category": "Sentinel Rules"
       },
       {
+        "command": "sentinelRules.createSentinelRule",
+        "title": "Create Sentinel Rule Template...",
+        "category": "Sentinel Rules"
+      },
+      {
         "command": "sentinelRules.generateTemplate",
         "title": "Generate Standard Rule Template",
         "category": "Sentinel Rules"
@@ -141,7 +146,7 @@
       "explorer/context": [
         {
           "when": "explorerResourceIsFolder",
-          "command": "sentinelRules.generateTemplate",
+          "command": "sentinelRules.createSentinelRule",
           "group": "sentinel@1"
         },
         {
@@ -156,7 +161,7 @@
           "when": "resourceExtname == .yaml"
         },
         {
-          "command": "sentinelRules.generateTemplate"
+          "command": "sentinelRules.createSentinelRule"
         },
         {
           "command": "sentinelRules.formatRule",

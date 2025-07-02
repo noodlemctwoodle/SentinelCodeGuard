@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.7-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.8-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **A development toolkit for Microsoft Sentinel Analytics Rules**
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.7).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.8).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -62,6 +62,32 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ## 📈 Recent Updates
 
+### v0.0.8 (2025-07-02)
+
+#### 🎯 Enhanced Template Creation Workflow
+
+- **Interactive template selection** with visual quick-pick interface
+- **Intelligent right-click workflow** - Right-click folder → Create Sentinel Rule Template → Choose type → Select location
+- **All template types available** from context menu (Standard, Advanced, NRT, Behaviour Analytics, Minimal, Fallback)
+- **Smart default locations** using right-clicked folder path
+- **Professional file naming** with template-specific suggestions
+
+#### 🛠️ Improved User Experience
+
+- **Single entry point** for all template creation via "Create Sentinel Rule Template..."
+- **Step-by-step workflow** with clear prompts and cancellation support
+- **Automatic file opening** after template creation
+- **Enhanced notifications** for success and error states
+- **Native VS Code integration** using standard save dialogues and UI patterns
+
+#### 📋 Template Management
+
+- **Visual template selection** with icons, descriptions, and use cases
+- **Template-specific filenames** following established naming conventions
+- **Support for both extensions** (.yaml and .yml)
+- **Comprehensive template library** covering all Sentinel rule scenarios
+
+=======
 ### v0.0.7 (2025-07-01)
 
 #### 🎯 Enhanced MITRE ATT&CK Integration
@@ -71,12 +97,14 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Comprehensive technique/tactic validation** with auto-correction
 
 #### 🔧 Improved Formatting & Validation
+
 - **Rule-type-specific validation** for Scheduled vs NRT rules
 - **Enhanced duration handling** including `lookbackDuration` field support
 - **Better field ordering** with `lookbackDuration` positioned correctly
 - **Improved error handling** and YAML repair functionality
 
 #### 🔄 ARM Conversion Enhancements
+
 - **Renamed context menu** to "Decompile ARM to YAML" for clarity
 - **Lowercase filename generation** for consistency
 - **Improved command registration** and context menu integration
