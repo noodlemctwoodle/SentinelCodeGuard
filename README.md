@@ -139,7 +139,7 @@ Convert multiple rules from a single ARM template:
 
 ### Advanced Configuration
 
-For comprehensive configuration options, see: **[Configuration Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion/Configuration-Options)**
+For comprehensive configuration options, see: **[Configuration Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide#advanced-conversion-settings)**
 
 ---
 
