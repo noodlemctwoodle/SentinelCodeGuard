@@ -1,8 +1,8 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.7-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.8-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**Development toolkit for Microsoft Sentinel Analytics Rules**
+**A development toolkit for Microsoft Sentinel Analytics Rules**
 
 *Guard your Sentinel rules with precision*
 
@@ -12,16 +12,16 @@
 
 **Complete documentation is available in our [Wiki](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)**
 
-- **[Getting Started Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature overview and quick start
-- **[Rule Templates](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates)** - Professional templates with best practices
-- **[ARM to YAML Conversion](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion)** - Comprehensive migration guide
-- **[Configuration](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion/Configuration-Options)** - Detailed setup and customization
+- **[Getting Started Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki#-quick-start)** - Complete feature overview and quick start
+- **[Rule Templates](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates)** - Professional templates with best practices
+- **[ARM to YAML Conversion](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Decompile-ARM-to-YAML)** - Comprehensive migration guide
+- **[Configuration](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide)** - Detailed setup and customization
 
 ---
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.7).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.8).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -60,12 +60,73 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ---
 
+## 📈 Recent Updates
+
+### v0.0.8 (2025-07-02)
+
+#### 🎯 Enhanced Template Creation Workflow
+
+- **Interactive template selection** with visual quick-pick interface
+- **Intelligent right-click workflow** - Right-click folder → Create Sentinel Rule Template → Choose type → Select location
+- **All template types available** from context menu (Standard, Advanced, NRT, Behaviour Analytics, Minimal, Fallback)
+- **Smart default locations** using right-clicked folder path
+- **Professional file naming** with template-specific suggestions
+
+#### 🛠️ Improved User Experience
+
+- **Single entry point** for all template creation via "Create Sentinel Rule Template..."
+- **Step-by-step workflow** with clear prompts and cancellation support
+- **Automatic file opening** after template creation
+- **Enhanced notifications** for success and error states
+- **Native VS Code integration** using standard save dialogues and UI patterns
+
+#### 📋 Template Management
+
+- **Visual template selection** with icons, descriptions, and use cases
+- **Template-specific filenames** following established naming conventions
+- **Support for both extensions** (.yaml and .yml)
+- **Comprehensive template library** covering all Sentinel rule scenarios
+
+### v0.0.7 (2025-07-01)
+
+#### 🎯 Enhanced MITRE ATT&CK Integration
+
+- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
+- **Rich hover provider** for techniques and tactics with detailed information
+- **Context-aware hovers** that only trigger on actual MITRE fields
+- **Comprehensive technique/tactic validation** with auto-correction
+
+#### 🔧 Improved Formatting & Validation
+
+- **Rule-type-specific validation** for Scheduled vs NRT rules
+- **Enhanced duration handling** including `lookbackDuration` field support
+- **Better field ordering** with `lookbackDuration` positioned correctly
+- **Improved error handling** and YAML repair functionality
+
+#### 🔄 ARM Conversion Enhancements
+
+- **Renamed context menu** to "Decompile ARM to YAML" for clarity
+- **Lowercase filename generation** for consistency
+- **Improved command registration** and context menu integration
+- **Better error handling** during conversion process
+
+#### 🛠️ Developer Experience
+- **Cleaner validation logic** with unused imports removed
+- **Refactored required fields** logic for maintainability
+- **Enhanced TypeScript support** with proper type definitions
+- **Improved code organization** and documentation
+
+[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Change-Log)
+
+---
+
 ## 🚀 Quick Start
 
 ### Installation
 
 1. **From VS Code Marketplace**: Search for "SentinelCodeGuard" in Extensions
-2. **Manual Installation**: Download `.vsix` from [GitHub Releases](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
+2. **From Visual Studio Marketplace**: [SentinelCodeGuard](https://marketplace.visualstudio.com/items?itemName=noodlemctwoodle.sentinelcodeguard)
+3. **Manual Installation**: Download `.vsix` from [GitHub Releases](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
 
 ### Create Your First Rule
 
@@ -83,14 +144,29 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ---
 
+## 🔧 Commands
+
+| Command | Description |
+|---------|-------------|
+| `Sentinel Rules: Generate Standard Rule Template` | Create general-purpose rule |
+| `Sentinel Rules: Generate Advanced Rule Template` | Create complex detection rule |
+| `Sentinel Rules: Generate NRT Rule Template` | Create near real-time rule |
+| `Sentinel Rules: Generate Behavior Analytics Template` | Create ML-based rule |
+| `Sentinel Rules: Decompile ARM to YAML` | Convert ARM templates to YAML |
+| `Sentinel Rules: Format Sentinel Rule` | Format and optimise structure |
+| `Sentinel Rules: Validate All Workspace Rules` | Bulk validation |
+
+---
+
 ## 📋 Available Templates
 
-| Template | Use Case | Documentation |
-|----------|----------|---------------|
-| **Standard** | General detection rules | [Standard Rule Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/StandardRuleTemplate) |
-| **Advanced** | Complex multi-stage detection | [Advanced Rule Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/AdvancedRuleTemplate) |
-| **NRT** | Near real-time alerts | [NRT Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/NearReal-Time(NRT)Template) |
-| **Behavior Analytics** | ML-based anomaly detection | [Behavior Analytics Template](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates/BehaviorAnalyticsTemplate) |
+| Template | Complexity | Use Case | Target Audience |
+|----------|------------|----------|-----------------|
+| **[Minimal](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#minimal-template)** | ![Low](https://img.shields.io/badge/complexity-low-green) | Quick prototyping | New users, rapid testing |
+| **[Standard](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#standard-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | General detection | SOC analysts, security engineers |
+| **[Advanced](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#advanced-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Complex correlation | Senior analysts, threat hunters |
+| **[NRT](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#near-real-time-template)** | ![Medium](https://img.shields.io/badge/complexity-medium-yellow) | Real-time alerts | Critical asset monitoring |
+| **[Anomaly Detection](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates#anomaly-detection-template)** | ![High](https://img.shields.io/badge/complexity-high-orange) | Behavioural analysis | Advanced threat hunting |
 
 ---
 
@@ -136,89 +212,21 @@ Convert multiple rules from a single ARM template:
 
 ### Advanced Configuration
 
-For comprehensive configuration options, see: **[Configuration Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion/Configuration-Options)**
-
----
-
-## 🔧 Commands
-
-| Command | Description |
-|---------|-------------|
-| `Sentinel: Generate Standard Rule Template` | Create general-purpose rule |
-| `Sentinel: Generate Advanced Rule Template` | Create complex detection rule |
-| `Sentinel: Generate NRT Rule Template` | Create near real-time rule |
-| `Sentinel: Generate Behavior Analytics Template` | Create ML-based rule |
-| `Sentinel: Decompile ARM to YAML` | Convert ARM templates to YAML |
-| `Sentinel: Format Sentinel Rule` | Format and optimize structure |
-| `Sentinel: Validate All Workspace Rules` | Bulk validation |
+For comprehensive configuration options, see: **[Configuration Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide#advanced-conversion-settings)**
 
 ---
 
 ## 🆘 Support & Troubleshooting
 
-### Documentation
+### Resources
 
-- **[Complete Wiki](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Comprehensive guides and examples
-- **[Troubleshooting](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki#-getting-help)** - Common issues and solutions
-- **[Configuration Help](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion/Configuration-Options#troubleshooting-configuration-issues)** - Setup and settings guidance
-
-### Community
-
-- **[GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues)** - Bug reports and feature requests
-- **[Discussions](https://github.com/noodlemctwoodle/SentinelCodeGuard/discussions)** - Community support
-- **[sentinel.blog](https://sentinel.blog)** - Additional resources and tutorials
-
-### Quick Fixes
-
-- **Extension not detecting files?** Ensure YAML contains 3+ Sentinel fields (`tactics`, `techniques`, `queryFrequency`, etc.)
-- **Commands missing?** Open any YAML file to activate the extension
-- **Validation issues?** Check Problems panel for detailed diagnostics
-
----
-
-## 📈 Recent Updates
-
-### v0.0.7 (2025-07-01)
-
-#### 🎯 Enhanced MITRE ATT&CK Integration
-- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
-- **Rich hover provider** for techniques and tactics with detailed information
-- **Context-aware hovers** that only trigger on actual MITRE fields
-- **Comprehensive technique/tactic validation** with auto-correction
-
-#### 🔧 Improved Formatting & Validation
-- **Rule-type-specific validation** for Scheduled vs NRT rules
-- **Enhanced duration handling** including `lookbackDuration` field support
-- **Better field ordering** with `lookbackDuration` positioned correctly
-- **Improved error handling** and YAML repair functionality
-
-#### 🔄 ARM Conversion Enhancements
-- **Renamed context menu** to "Decompile ARM to YAML" for clarity
-- **Lowercase filename generation** for consistency
-- **Improved command registration** and context menu integration
-- **Better error handling** during conversion process
-
-#### 🛠️ Developer Experience
-- **Cleaner validation logic** with unused imports removed
-- **Refactored required fields** logic for maintainability
-- **Enhanced TypeScript support** with proper type definitions
-- **Improved code organization** and documentation
-
-### v0.0.6 (2025-06-25)
-
-- **Enhanced ARM Conversion** with improved field mapping
-- **Comprehensive Wiki Documentation** with detailed guides
-- **Expanded Templates** including Behavior Analytics and NRT
-- **Performance Optimizations** and cleaner packaging
-- **Better Validation** with enhanced MITRE ATT&CK support
-
-[View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CHANGELOG.md)
+- **[Microsoft Sentinel Docs](https://docs.microsoft.com/azure/sentinel/)** - Official documentation
+- **[MITRE ATT&CK](https://attack.mitre.org/)** - Framework reference
+- **[KQL Reference](https://docs.microsoft.com/azure/data-explorer/kusto/query/)** - Query language docs
 
 ---
 
 ## 🤝 Contributing
-
-We welcome contributions! See our [Contributing Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/CONTRIBUTING.md) for details.
 
 1. Fork the repository
 2. Create a feature branch
@@ -229,18 +237,8 @@ We welcome contributions! See our [Contributing Guide](https://github.com/noodle
 
 ## 📄 License
 
-MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/noodlemctwoodle/SentinelCodeGuard/blob/main/LICENSE.txt) for details.
 
 ---
 
-## 🔗 Resources
-
-- **[Wiki Documentation](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature guides
-- **[Microsoft Sentinel Docs](https://docs.microsoft.com/azure/sentinel/)** - Official documentation
-- **[MITRE ATT&CK](https://attack.mitre.org/)** - Framework reference
-- **[KQL Reference](https://docs.microsoft.com/azure/data-explorer/kusto/query/)** - Query language docs
-- **[sentinel.blog](https://sentinel.blog)** - Additional tutorials and insights
-
----
-
-**SentinelCodeGuard** - Professional development toolkit for Microsoft Sentinel Analytics Rules
+**SentinelCodeGuard** - A development toolkit for Microsoft Sentinel Analytics Rules
