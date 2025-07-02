@@ -13,9 +13,9 @@
 **Complete documentation is available in our [Wiki](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)**
 
 - **[Getting Started Guide](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki)** - Complete feature overview and quick start
-- **[Rule Templates](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/RuleTemplates)** - Professional templates with best practices
-- **[ARM to YAML Conversion](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion)** - Comprehensive migration guide
-- **[Configuration](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/ARMTemplatetoYAMLConversion/Configuration-Options)** - Detailed setup and customization
+- **[Rule Templates](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Rule-Templates)** - Professional templates with best practices
+- **[ARM to YAML Conversion](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Decompile-ARM-to-YAML)** - Comprehensive migration guide
+- **[Configuration](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Configuration-Guide)** - Detailed setup and customization
 
 ---
 
