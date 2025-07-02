@@ -65,7 +65,8 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 ### Installation
 
 1. **From VS Code Marketplace**: Search for "SentinelCodeGuard" in Extensions
-2. **Manual Installation**: Download `.vsix` from [GitHub Releases](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
+2. **From Visual Studio Marketplace**: [SentinelCodeGuard](https://marketplace.visualstudio.com/items?itemName=noodlemctwoodle.sentinelcodeguard)
+3. **Manual Installation**: Download `.vsix` from [GitHub Releases](https://github.com/noodlemctwoodle/SentinelCodeGuard/releases)
 
 ### Create Your First Rule
 
