@@ -192,8 +192,8 @@ export const VALIDATION_PATTERNS = {
     // Valid entity type format (PascalCase)
     ENTITY_TYPE: /^[A-Z][a-zA-Z0-9]*$/,
     
-    // Valid connector ID format
-    CONNECTOR_ID: /^[A-Za-z][A-Za-z0-9]*$/
+    // Valid connector ID format - Updated to match real connector IDs from Content Hub
+    CONNECTOR_ID: /^[A-Za-z][A-Za-z0-9_-]*$/
 } as const;
 
 // ============================================================================
@@ -263,6 +263,24 @@ export const SENTINEL_RULE_INDICATORS = [
 
 // Minimum number of indicators required to consider it a Sentinel rule
 export const MIN_SENTINEL_INDICATORS = 3;
+
+// ============================================================================
+// DATA TYPE NORMALIZATION
+// ============================================================================
+// Patterns for normalizing data type names during validation
+export const DATA_TYPE_NORMALIZATION_PATTERNS = [
+    // Remove parenthetical vendor/product info: "CommonSecurityLog (Fortinet)" -> "CommonSecurityLog"
+    { pattern: /\s*\([^)]*\)/g, replacement: '' },
+    
+    // Remove _CL suffix for custom logs: "MyLogs_CL" -> "MyLogs"
+    { pattern: /_CL$/i, replacement: '' },
+    
+    // Normalize whitespace
+    { pattern: /\s+/g, replacement: ' ' },
+    
+    // Trim
+    { pattern: /^\s+|\s+$/g, replacement: '' }
+] as const;
 
 // ============================================================================
 // EXPORTS

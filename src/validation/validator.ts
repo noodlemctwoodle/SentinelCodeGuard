@@ -131,7 +131,7 @@ export class SentinelRuleValidator {
         this.validateMitreTechniques(parsedYaml, lines, errors, warnings);
 
         // Validate data connectors
-        this.validateDataConnectors(parsedYaml, lines, warnings);
+        this.validateDataConnectors(parsedYaml, lines, warnings, errors);
 
         // Validate GUID format for id field
         if (parsedYaml.id && !VALIDATION_PATTERNS.GUID.test(parsedYaml.id)) {
@@ -285,20 +285,73 @@ export class SentinelRuleValidator {
         }
     }
 
-    private validateDataConnectors(parsedYaml: any, lines: string[], warnings: vscode.Diagnostic[]) {
+    private validateDataConnectors(parsedYaml: any, lines: string[], warnings: vscode.Diagnostic[], errors: vscode.Diagnostic[]) {
         if (parsedYaml.requiredDataConnectors && Array.isArray(parsedYaml.requiredDataConnectors)) {
             parsedYaml.requiredDataConnectors.forEach((connector: any, index: number) => {
                 if (connector.connectorId) {
-                    const validation = ConnectorLoader.validateConnector(connector.connectorId);
-                    if (!validation.isValid && validation.message) {
+                    // Validate the complete connector configuration
+                    const validation = ConnectorLoader.validateDataConnector({
+                        connectorId: connector.connectorId,
+                        dataTypes: connector.dataTypes || []
+                    });
+                    
+                    // Handle connector ID validation
+                    if (!validation.connectorValidation.isValid && validation.connectorValidation.message) {
                         const line = this.findFieldLine(lines, `requiredDataConnectors[${index}].connectorId`, connector.connectorId);
                         if (line !== -1) {
-                            warnings.push(new vscode.Diagnostic(
+                            const diagnostic = new vscode.Diagnostic(
                                 new vscode.Range(line, 0, line, lines[line].length),
-                                validation.message,
-                                validation.severity || vscode.DiagnosticSeverity.Warning
-                            ));
+                                validation.connectorValidation.message,
+                                validation.connectorValidation.severity
+                            );
+                            
+                            if (validation.connectorValidation.severity === vscode.DiagnosticSeverity.Error) {
+                                errors.push(diagnostic);
+                            } else {
+                                warnings.push(diagnostic);
+                            }
                         }
+                    }
+                    
+                    // Handle data types validation
+                    if (validation.dataTypeValidation.invalidDataTypes.length > 0 || 
+                        validation.dataTypeValidation.missingDataTypes.length > 0) {
+                        
+                        if (validation.dataTypeValidation.message) {
+                            const line = this.findFieldLine(lines, `requiredDataConnectors[${index}].dataTypes`);
+                            if (line !== -1) {
+                                const diagnostic = new vscode.Diagnostic(
+                                    new vscode.Range(line, 0, line, lines[line].length),
+                                    validation.dataTypeValidation.message,
+                                    validation.dataTypeValidation.severity || vscode.DiagnosticSeverity.Warning
+                                );
+                                
+                                if (validation.dataTypeValidation.severity === vscode.DiagnosticSeverity.Error) {
+                                    errors.push(diagnostic);
+                                } else {
+                                    warnings.push(diagnostic);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Validate individual data types if connector is known
+                    if (connector.dataTypes && Array.isArray(connector.dataTypes)) {
+                        connector.dataTypes.forEach((dataType: string, dtIndex: number) => {
+                            if (validation.dataTypeValidation.invalidDataTypes.includes(dataType)) {
+                                const line = this.findFieldLine(lines, `requiredDataConnectors[${index}].dataTypes`, dataType);
+                                if (line !== -1) {
+                                    const connectorInfo = ConnectorLoader.getConnectorInfo(connector.connectorId);
+                                    const availableTypes = connectorInfo?.dataTypes.join(', ') || 'none';
+                                    
+                                    warnings.push(new vscode.Diagnostic(
+                                        new vscode.Range(line, 0, line, lines[line].length),
+                                        `Data type '${dataType}' not available for connector '${connector.connectorId}'. Available: ${availableTypes}`,
+                                        vscode.DiagnosticSeverity.Warning
+                                    ));
+                                }
+                            }
+                        });
                     }
                 }
             });

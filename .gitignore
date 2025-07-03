@@ -12,6 +12,7 @@ out/
 .vscode-test/
 .vscode-test-web/
 
+
 # VS Code workspace settings (but keep launch.json and tasks.json for development)
 .vscode/settings.json
 # Keep .vscode/launch.json and .vscode/tasks.json for debugging
@@ -143,6 +144,7 @@ docs/_build/
 
 # Local development files
 .local/
+.internal
 local/
-
+temp
 SentinelCodeGuard.code-workspace

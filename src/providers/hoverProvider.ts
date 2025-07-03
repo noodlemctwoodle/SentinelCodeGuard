@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { MitreLoader } from '../validation/mitreLoader';
+import { ConnectorLoader } from '../validation/connectorLoader';
 
 export class SentinelRuleHoverProvider implements vscode.HoverProvider {
     
@@ -27,6 +28,16 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
                 if (mitreContext === 'tactics') {
                     return this.createTacticHover(tacticName, wordRange);
                 }
+            }
+        }
+        
+        // Check for connector ID hover
+        const connectorContext = this.getConnectorContext(document, position);
+        if (connectorContext) {
+            wordRange = document.getWordRangeAtPosition(position, /[A-Za-z][A-Za-z0-9_-]*/);
+            if (wordRange) {
+                const connectorId = document.getText(wordRange);
+                return this.createConnectorHover(connectorId, wordRange);
             }
         }
         
@@ -210,5 +221,63 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
         if (!baseUrl) return null;
         
         return `${baseUrl}/${tacticId}/`;
+    }
+    
+    /**
+     * Determines if the current position is within a connector-related YAML section
+     */
+    private getConnectorContext(document: vscode.TextDocument, position: vscode.Position): boolean {
+        // Look backwards to find if we're in a connector context
+        for (let i = position.line; i >= 0; i--) {
+            const line = document.lineAt(i).text;
+            const trimmedLine = line.trim();
+            
+            if (trimmedLine.includes('connectorId:') || trimmedLine.includes('requiredDataConnectors:')) {
+                return true;
+            }
+            
+            // Stop if we hit another top-level field
+            if (i < position.line && /^[a-zA-Z]/.test(trimmedLine)) {
+                break;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Creates hover information for connectors
+     */
+    private createConnectorHover(connectorId: string, range: vscode.Range): vscode.Hover | undefined {
+        const connectorInfo = ConnectorLoader.getConnectorInfo(connectorId);
+        
+        if (connectorInfo) {
+            const markdown = new vscode.MarkdownString();
+            markdown.isTrusted = true;
+            
+            markdown.appendMarkdown(`### ${connectorInfo.displayName}\n\n`);
+            
+            if (connectorInfo.deprecated) {
+                markdown.appendMarkdown(`⚠️ **This connector is deprecated**\n\n`);
+            }
+            
+            if (connectorInfo.description) {
+                markdown.appendMarkdown(`${connectorInfo.description}\n\n`);
+            }
+            
+            if (connectorInfo.dataTypes.length > 0) {
+                markdown.appendMarkdown(`**Available Data Types:**\n`);
+                connectorInfo.dataTypes.forEach(dataType => {
+                    markdown.appendMarkdown(`• \`${dataType}\`\n`);
+                });
+            }
+            
+            if (connectorInfo.publisher) {
+                markdown.appendMarkdown(`\n**Publisher:** ${connectorInfo.publisher}`);
+            }
+            
+            return new vscode.Hover(markdown, range);
+        }
+        
+        return undefined;
     }
 }
