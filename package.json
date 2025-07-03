@@ -126,7 +126,7 @@
       },
       {
         "command": "sentinelRules.validateWorkspace",
-        "title": "Validate All Workspace Rules",
+        "title": "Bulk Maintenance & Validation",
         "category": "Sentinel Rules"
       },
       {
