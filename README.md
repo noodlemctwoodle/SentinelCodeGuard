@@ -1,8 +1,8 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.8-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.9-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**A development toolkit for Microsoft Sentinel Analytics Rules**
+**Development toolkit for Microsoft Sentinel Analytics Rules**
 
 *Guard your Sentinel rules with precision*
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.8).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.9).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -38,7 +38,7 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Content-based detection** - Automatically identifies Sentinel rules by analyzing YAML content
 - **Real-time validation** with instant feedback and error correction
 - **Professional templates** for all rule types (Standard, Advanced, NRT, Behavior Analytics)
-- **MITRE ATT&CK v16 validation** with auto-correction and hover information
+- **Multi-framework MITRE ATT&CK validation** - Enterprise, Mobile, and ICS frameworks
 - **Smart IntelliSense** for all Sentinel fields and values
 
 ### 🔄 ARM Template Migration
@@ -55,12 +55,47 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Live validation** in the Problems panel with rule-type-specific checks
 - **Code snippets** and auto-completion
 - **Entity mapping helpers** for all entity types
-- **MITRE ATT&CK hover provider** with detailed technique and tactic information
 - **Workspace integration** for team collaboration
 
 ---
 
 ## 📈 Recent Updates
+
+### v0.0.9 (2025-07-03)
+
+#### 🌐 Enhanced MITRE ATT&CK Support
+
+- **Multi-Framework Coverage** - Now supports Enterprise, Mobile, and ICS MITRE ATT&CK frameworks
+- **Eliminated "Tactics Not Found" Errors** - Comprehensive coverage of all Sentinel-supported tactics and techniques
+- **Framework-Aware Hover Information** - Enhanced tooltips showing which framework tactics/techniques belong to
+- **Official MITRE Data Integration** - Direct use of official MITRE JSON data sources for accuracy
+
+#### 🆔 GUID Management Features
+
+- **Regenerate Rule GUID** - Right-click on YAML files to replace existing GUIDs with new ones
+- **Add Missing GUID** - Automatically detect files without GUIDs and offer to add them
+- **Smart GUID Detection** - Recognises both actual GUIDs and template placeholders (`{{GUID}}`)
+- **Confirmation Dialogs** - Preview old and new GUIDs before replacement
+- **Auto-GUID Templates** - All new templates automatically replace `{{GUID}}` placeholders with real UUIDs
+
+#### 🛠️ Enhanced Template Experience
+
+- **Unified Command Interface** - Single "Generate Rule Template" command in command palette with interactive template selection
+- **Streamlined Command Palette** - Removed individual template commands for cleaner interface
+- **Dual Access Points** - Templates available via both command palette and right-click context menu
+- **Unique IDs for Every Template** - No more duplicate GUIDs when creating multiple templates
+- **Proper Indentation Preservation** - GUID replacement maintains YAML formatting
+- **Context Menu Integration** - "Regenerate Rule GUID" available via right-click
+- **Bulk Template Creation** - Each template gets a unique GUID automatically
+
+#### 🎯 Developer Productivity
+
+- **Simplified Workflow** - One command for all template types instead of multiple separate commands
+- **Quick GUID Regeneration** - Perfect for duplicating existing rules
+- **Template-to-Production** - Convert templates with placeholder GUIDs to production-ready rules
+- **Rule Duplication Workflow** - Copy existing rules and generate new GUIDs instantly
+- **Error Prevention** - Ensures unique identifiers across rule sets
+- **Professional Command Structure** - Clean, organized command palette experience
 
 ### v0.0.8 (2025-07-02)
 
@@ -86,35 +121,6 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Template-specific filenames** following established naming conventions
 - **Support for both extensions** (.yaml and .yml)
 - **Comprehensive template library** covering all Sentinel rule scenarios
-
-=======
-### v0.0.7 (2025-07-01)
-
-#### 🎯 Enhanced MITRE ATT&CK Integration
-- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
-- **Rich hover provider** for techniques and tactics with detailed information
-- **Context-aware hovers** that only trigger on actual MITRE fields
-- **Comprehensive technique/tactic validation** with auto-correction
-
-#### 🔧 Improved Formatting & Validation
-
-- **Rule-type-specific validation** for Scheduled vs NRT rules
-- **Enhanced duration handling** including `lookbackDuration` field support
-- **Better field ordering** with `lookbackDuration` positioned correctly
-- **Improved error handling** and YAML repair functionality
-
-#### 🔄 ARM Conversion Enhancements
-
-- **Renamed context menu** to "Decompile ARM to YAML" for clarity
-- **Lowercase filename generation** for consistency
-- **Improved command registration** and context menu integration
-- **Better error handling** during conversion process
-
-#### 🛠️ Developer Experience
-- **Cleaner validation logic** with unused imports removed
-- **Refactored required fields** logic for maintainability
-- **Enhanced TypeScript support** with proper type definitions
-- **Improved code organization** and documentation
 
 [View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Change-Log)
 
@@ -148,13 +154,13 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 | Command | Description |
 |---------|-------------|
-| `Sentinel Rules: Generate Standard Rule Template` | Create general-purpose rule |
-| `Sentinel Rules: Generate Advanced Rule Template` | Create complex detection rule |
-| `Sentinel Rules: Generate NRT Rule Template` | Create near real-time rule |
-| `Sentinel Rules: Generate Behavior Analytics Template` | Create ML-based rule |
+| `Sentinel Rules: Generate Rule Template` | Interactive template creation workflow with multiple template types |
+| `Sentinel Rules: Generate New Rule ID` | Generate new GUID for current rule |
+| `Sentinel Rules: Generate New IDs for All Rules` | Bulk GUID regeneration for workspace |
+| `Sentinel Rules: Fix Field Order` | Reorder fields according to best practices |
+| `Sentinel Rules: Format Sentinel Rule` | Format and optimise rule structure |
+| `Sentinel Rules: Bulk Maintenance & Validation` | Workspace-wide validation and maintenance |
 | `Sentinel Rules: Decompile ARM to YAML` | Convert ARM templates to YAML |
-| `Sentinel Rules: Format Sentinel Rule` | Format and optimise structure |
-| `Sentinel Rules: Validate All Workspace Rules` | Bulk validation |
 
 ---
 

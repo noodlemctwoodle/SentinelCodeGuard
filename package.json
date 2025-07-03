@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -90,6 +90,21 @@
         "category": "Sentinel Rules"
       },
       {
+        "command": "sentinelRules.generateRuleTemplate",
+        "title": "Generate Rule Template",
+        "category": "Sentinel Rules"
+      },
+      {
+        "command": "sentinelRules.regenerateGuid",
+        "title": "Generate New Rule ID",
+        "category": "Sentinel Rules"
+      },
+      {
+        "command": "sentinelRules.regenerateAllGuids",
+        "title": "Generate New IDs for All Rules",
+        "category": "Sentinel Rules"
+      },
+      {
         "command": "sentinelRules.generateTemplate",
         "title": "Generate Standard Rule Template",
         "category": "Sentinel Rules"
@@ -116,7 +131,7 @@
       },
       {
         "command": "sentinelRules.validateWorkspace",
-        "title": "Validate All Workspace Rules",
+        "title": "Bulk Maintenance & Validation",
         "category": "Sentinel Rules"
       },
       {
@@ -138,9 +153,14 @@
           "group": "sentinel@2"
         },
         {
+          "when": "resourceExtname == .yaml || resourceExtname == .yml",
+          "command": "sentinelRules.regenerateGuid",
+          "group": "sentinel@3"
+        },
+        {
           "when": "resourceExtname == .json && config.sentinelRules.conversion.enabled",
           "command": "sentinelRules.convertArmToYaml",
-          "group": "sentinel@3"
+          "group": "sentinel@4"
         }
       ],
       "explorer/context": [
@@ -148,6 +168,11 @@
           "when": "explorerResourceIsFolder",
           "command": "sentinelRules.createSentinelRule",
           "group": "sentinel@1"
+        },
+        {
+          "when": "resourceExtname == .yaml || resourceExtname == .yml",
+          "command": "sentinelRules.regenerateGuid",
+          "group": "sentinel@2"
         },
         {
           "when": "resourceExtname == .json && config.sentinelRules.conversion.enabled",
@@ -161,7 +186,18 @@
           "when": "resourceExtname == .yaml"
         },
         {
-          "command": "sentinelRules.createSentinelRule"
+          "command": "sentinelRules.createSentinelRule",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateRuleTemplate"
+        },
+        {
+          "command": "sentinelRules.regenerateGuid",
+          "when": "resourceExtname == .yaml"
+        },
+        {
+          "command": "sentinelRules.regenerateAllGuids"
         },
         {
           "command": "sentinelRules.formatRule",
@@ -173,6 +209,26 @@
         {
           "command": "sentinelRules.convertArmToYaml",
           "when": "config.sentinelRules.conversion.enabled"
+        },
+        {
+          "command": "sentinelRules.generateTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateAdvancedTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateNRTTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateBehaviorAnalyticsTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateMinimalTemplate",
+          "when": "false"
         }
       ]
     },
@@ -231,6 +287,23 @@
             "v14"
           ],
           "description": "MITRE ATT&CK framework version to use for validation"
+        },
+        "sentinelRules.mitre.frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "enterprise",
+              "mobile",
+              "ics"
+            ]
+          },
+          "default": [
+            "enterprise",
+            "mobile",
+            "ics"
+          ],
+          "description": "MITRE ATT&CK frameworks to load and validate against"
         },
         "sentinelRules.connectors.validationMode": {
           "type": "string",
