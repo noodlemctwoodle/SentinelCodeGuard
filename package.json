@@ -91,7 +91,12 @@
       },
       {
         "command": "sentinelRules.regenerateGuid",
-        "title": "Regenerate Rule GUID",
+        "title": "Generate New Rule ID",
+        "category": "Sentinel Rules"
+      },
+      {
+        "command": "sentinelRules.regenerateAllGuids",
+        "title": "Generate New IDs for All Rules",
         "category": "Sentinel Rules"
       },
       {
@@ -143,7 +148,7 @@
           "group": "sentinel@2"
         },
         {
-          "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
+          "when": "resourceExtname == .yaml || resourceExtname == .yml",
           "command": "sentinelRules.regenerateGuid",
           "group": "sentinel@3"
         },
@@ -158,6 +163,11 @@
           "when": "explorerResourceIsFolder",
           "command": "sentinelRules.createSentinelRule",
           "group": "sentinel@1"
+        },
+        {
+          "when": "resourceExtname == .yaml || resourceExtname == .yml",
+          "command": "sentinelRules.regenerateGuid",
+          "group": "sentinel@2"
         },
         {
           "when": "resourceExtname == .json && config.sentinelRules.conversion.enabled",
@@ -176,6 +186,9 @@
         {
           "command": "sentinelRules.regenerateGuid",
           "when": "resourceExtname == .yaml"
+        },
+        {
+          "command": "sentinelRules.regenerateAllGuids"
         },
         {
           "command": "sentinelRules.formatRule",

@@ -69,9 +69,14 @@ export class CommandManager {
             vscode.commands.registerCommand('sentinelRules.validateWorkspace', this.validateWorkspace.bind(this))
         );
 
-        // NEW: Regenerate GUID command
+        // FIXED: Individual GUID regeneration (now supports both editor and explorer context)
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.regenerateGuid', this.regenerateGuid.bind(this))
+        );
+
+        // NEW: Bulk GUID regeneration
+        disposables.push(
+            vscode.commands.registerCommand('sentinelRules.regenerateAllGuids', this.regenerateAllGuids.bind(this))
         );
 
         return disposables;
@@ -443,24 +448,43 @@ export class CommandManager {
     }
 
     /**
-     * NEW: Regenerate GUID in the current Sentinel rule
+     * FIXED: Regenerate GUID in the current Sentinel rule (works from both editor and explorer context)
      */
-    private async regenerateGuid(): Promise<void> {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showErrorMessage('No active editor found');
-            return;
-        }
-
-        const document = editor.document;
-        
-        // Validate this is a YAML file
-        if (!document.fileName.match(/\.(yaml|yml)$/)) {
-            vscode.window.showErrorMessage('This command only works on YAML files');
-            return;
-        }
-
+    private async regenerateGuid(uri?: vscode.Uri): Promise<void> {
         try {
+            let targetFile: vscode.Uri;
+            let document: vscode.TextDocument;
+
+            if (uri) {
+                // Called from explorer context menu - use the provided URI
+                targetFile = uri;
+                
+                // Validate this is a YAML file
+                if (!targetFile.fsPath.match(/\.(yaml|yml)$/)) {
+                    vscode.window.showErrorMessage('This command only works on YAML files');
+                    return;
+                }
+                
+                // Open the document
+                document = await vscode.workspace.openTextDocument(targetFile);
+            } else {
+                // Called from editor context or command palette - use active editor
+                const editor = vscode.window.activeTextEditor;
+                if (!editor) {
+                    vscode.window.showErrorMessage('No active editor found');
+                    return;
+                }
+
+                document = editor.document;
+                targetFile = document.uri;
+                
+                // Validate this is a YAML file
+                if (!document.fileName.match(/\.(yaml|yml)$/)) {
+                    vscode.window.showErrorMessage('This command only works on YAML files');
+                    return;
+                }
+            }
+
             const text = document.getText();
             const guidRegex = /^(\s*)id:\s*([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|\{\{GUID\}\})/im;
             const match = text.match(guidRegex);
@@ -473,36 +497,29 @@ export class CommandManager {
                 );
                 
                 if (addGuid === 'Yes') {
-                    await this.addGuidToFile(editor);
+                    await this.addGuidToFileUri(targetFile);
                 }
                 return;
             }
 
             const currentGuid = match[2];
             const indentation = match[1];
+            const newGuid = uuidv4();
             
             // Show confirmation dialog with current GUID
             const action = await vscode.window.showWarningMessage(
-                `Replace current GUID?\n\nCurrent: ${currentGuid}\nNew: ${uuidv4()}`,
+                `Generate new Rule ID for "${path.basename(targetFile.fsPath)}"?\n\nCurrent ID: ${currentGuid}\nNew ID: ${newGuid}`,
                 { modal: true },
-                'Replace GUID', 'Cancel'
+                'Generate New ID', 'Cancel'
             );
 
-            if (action === 'Replace GUID') {
-                const newGuid = uuidv4();
+            if (action === 'Generate New ID') {
                 const newText = text.replace(guidRegex, `${indentation}id: ${newGuid}`);
                 
-                // Apply the change
-                const fullRange = new vscode.Range(
-                    document.positionAt(0),
-                    document.positionAt(text.length)
-                );
-
-                await editor.edit(editBuilder => {
-                    editBuilder.replace(fullRange, newText);
-                });
-
-                vscode.window.showInformationMessage(`GUID regenerated successfully!\nNew ID: ${newGuid}`);
+                // Write the updated content directly to file
+                await vscode.workspace.fs.writeFile(targetFile, Buffer.from(newText, 'utf8'));
+                
+                vscode.window.showInformationMessage(`Rule ID generated successfully!\nFile: ${path.basename(targetFile.fsPath)}\nNew ID: ${newGuid}`);
             }
 
         } catch (error) {
@@ -512,8 +529,27 @@ export class CommandManager {
     }
 
     /**
-     * Add GUID field to file that doesn't have one
+     * FIXED: Add GUID field to file using URI (for explorer context)
      */
+    private async addGuidToFileUri(fileUri: vscode.Uri): Promise<void> {
+        try {
+            const document = await vscode.workspace.openTextDocument(fileUri);
+            const text = document.getText();
+            const newGuid = uuidv4();
+            
+            // Insert at the beginning of the file
+            const newText = `id: ${newGuid}\n${text}`;
+            
+            // Write the updated content directly to file
+            await vscode.workspace.fs.writeFile(fileUri, Buffer.from(newText, 'utf8'));
+            
+            vscode.window.showInformationMessage(`Rule ID added successfully!\nFile: ${path.basename(fileUri.fsPath)}\nNew ID: ${newGuid}`);
+        } catch (error) {
+            vscode.window.showErrorMessage(`Failed to add GUID: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
+    // Keep existing addGuidToFile method for backward compatibility with editor context
     private async addGuidToFile(editor: vscode.TextEditor): Promise<void> {
         const document = editor.document;
         const text = document.getText();
@@ -532,6 +568,195 @@ export class CommandManager {
         });
 
         vscode.window.showInformationMessage(`GUID added successfully!\nNew ID: ${newGuid}`);
+    }
+
+    /**
+     * NEW: Bulk regenerate GUIDs in all Sentinel YAML files within a specific folder
+     */
+    private async regenerateAllGuids(uri?: vscode.Uri): Promise<void> {
+        try {
+            // Determine target folder
+            let targetFolder: vscode.Uri;
+            
+            if (uri && uri.fsPath) {
+                // Called from right-click on folder (though this shouldn't happen now)
+                targetFolder = uri;
+            } else {
+                // Called from Command Palette - let user choose folder
+                const folderOptions = await vscode.window.showOpenDialog({
+                    canSelectFiles: false,
+                    canSelectFolders: true,
+                    canSelectMany: false,
+                    title: 'Select folder to regenerate GUIDs in',
+                    defaultUri: vscode.workspace.workspaceFolders?.[0]?.uri
+                });
+
+                if (!folderOptions || folderOptions.length === 0) {
+                    return; // User cancelled
+                }
+                targetFolder = folderOptions[0];
+            }
+
+            // FIXED: Search for ALL YAML files in the SPECIFIC folder only (not workspace-wide)
+            const allYamlFiles = await vscode.workspace.findFiles(
+                new vscode.RelativePattern(targetFolder, '**/*.{yaml,yml}'),
+                '**/node_modules/**'
+            );
+
+            // Filter for files that contain Sentinel rule content or have sentinel in filename
+            const sentinelFiles: vscode.Uri[] = [];
+            
+            for (const file of allYamlFiles) {
+                // Check if filename contains 'sentinel'
+                if (file.fsPath.toLowerCase().includes('sentinel')) {
+                    sentinelFiles.push(file);
+                    continue;
+                }
+                
+                // Check file content for Sentinel rule indicators
+                try {
+                    const content = await vscode.workspace.fs.readFile(file);
+                    const text = Buffer.from(content).toString('utf8');
+                    
+                    // Look for common Sentinel rule fields
+                    const sentinelIndicators = [
+                        /^\s*tactics\s*:/m,
+                        /^\s*techniques\s*:/m,
+                        /^\s*queryFrequency\s*:/m,
+                        /^\s*triggerOperator\s*:/m,
+                        /^\s*requiredDataConnectors\s*:/m
+                    ];
+                    
+                    const hasSentinelFields = sentinelIndicators.some(regex => regex.test(text));
+                    if (hasSentinelFields) {
+                        sentinelFiles.push(file);
+                    }
+                } catch (error) {
+                    // Skip files that can't be read
+                    console.log(`Skipping file ${file.fsPath}: ${error}`);
+                }
+            }
+
+            if (sentinelFiles.length === 0) {
+                vscode.window.showInformationMessage(
+                    `No Sentinel rule files found in the folder:\n${path.basename(targetFolder.fsPath)}\n\nLooking for YAML files with Sentinel rule fields (tactics, techniques, queryFrequency, etc.) or files with "sentinel" in the filename.`
+                );
+                return;
+            }
+
+            // FIXED: Check which files actually have GUIDs before showing confirmation
+            const filesWithGuids: vscode.Uri[] = [];
+            for (const file of sentinelFiles) {
+                try {
+                    const content = await vscode.workspace.fs.readFile(file);
+                    const text = Buffer.from(content).toString('utf8');
+                    const guidRegex = /^(\s*)id:\s*([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|\{\{GUID\}\})/im;
+                    
+                    if (guidRegex.test(text)) {
+                        filesWithGuids.push(file);
+                    }
+                } catch (error) {
+                    console.log(`Error checking GUID in ${file.fsPath}: ${error}`);
+                }
+            }
+
+            if (filesWithGuids.length === 0) {
+                vscode.window.showInformationMessage(
+                    `Found ${sentinelFiles.length} Sentinel rule file${sentinelFiles.length === 1 ? '' : 's'} in the folder, but none contain GUIDs to regenerate.`
+                );
+                return;
+            }
+
+            // Show confirmation dialog with accurate counts
+            const folderName = path.basename(targetFolder.fsPath);
+            const action = await vscode.window.showWarningMessage(
+                `Generate new Rule IDs for ${filesWithGuids.length} file${filesWithGuids.length === 1 ? '' : 's'} in folder "${folderName}"?\n\nFiles with IDs: ${filesWithGuids.length}\nTotal Sentinel files: ${sentinelFiles.length}\n\nThis will replace all existing Rule IDs with new ones.`,
+                { modal: true },
+                'Generate New IDs', 'Cancel'
+            );
+
+            if (action !== 'Generate New IDs') {
+                return;
+            }
+
+            // Process ONLY files with GUIDs
+            await vscode.window.withProgress({
+                location: vscode.ProgressLocation.Notification,
+                title: `Generating new Rule IDs in ${folderName}`,
+                cancellable: false
+            }, async (progress) => {
+                let processedFiles = 0;
+                let updatedFiles = 0;
+                let errors: string[] = [];
+
+                for (const file of filesWithGuids) {
+                    try {
+                        progress.report({
+                            increment: (processedFiles / filesWithGuids.length) * 100,
+                            message: `Processing ${path.basename(file.fsPath)}...`
+                        });
+
+                        const result = await this.regenerateGuidInFile(file);
+                        if (result.updated) {
+                            updatedFiles++;
+                        }
+                        if (result.error) {
+                            errors.push(`${path.basename(file.fsPath)}: ${result.error}`);
+                        }
+
+                        processedFiles++;
+                    } catch (error) {
+                        errors.push(`${path.basename(file.fsPath)}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                        processedFiles++;
+                    }
+                }
+
+                progress.report({ increment: 100, message: 'Complete!' });
+
+                // Show summary
+                let message = `Processed ${processedFiles} files in "${folderName}". Generated new Rule IDs in ${updatedFiles} files.`;
+                
+                if (errors.length > 0) {
+                    message += `\n\nErrors encountered:\n${errors.join('\n')}`;
+                    vscode.window.showWarningMessage(message, 'OK');
+                } else {
+                    vscode.window.showInformationMessage(message);
+                }
+            });
+
+        } catch (error) {
+            console.error('Error in bulk GUID regeneration:', error);
+            vscode.window.showErrorMessage(`Failed to regenerate GUIDs: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
+    /**
+     * Helper: Regenerate GUID in a specific file
+     */
+    private async regenerateGuidInFile(fileUri: vscode.Uri): Promise<{ updated: boolean; error?: string }> {
+        try {
+            const document = await vscode.workspace.openTextDocument(fileUri);
+            const text = document.getText();
+            
+            const guidRegex = /^(\s*)id:\s*([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|\{\{GUID\}\})/im;
+            const match = text.match(guidRegex);
+
+            if (!match) {
+                return { updated: false, error: 'No GUID found' };
+            }
+
+            const indentation = match[1];
+            const newGuid = uuidv4();
+            const newText = text.replace(guidRegex, `${indentation}id: ${newGuid}`);
+            
+            // Write the updated content
+            await vscode.workspace.fs.writeFile(fileUri, Buffer.from(newText, 'utf8'));
+            
+            return { updated: true };
+
+        } catch (error) {
+            return { updated: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        }
     }
 }
 
