@@ -60,132 +60,155 @@ export class SentinelRuleHoverProvider implements vscode.HoverProvider {
         return null;
     }
     
-    private createTechniqueHover(techniqueId: string, wordRange: vscode.Range): vscode.Hover | undefined {
-        // Check if it's a valid MITRE technique format
-        if (!/^T\d{4}(?:\.\d{3})?$/.test(techniqueId)) {
-            return undefined;
-        }
-        
+    /**
+     * Creates hover information for MITRE techniques
+     */
+    private createTechniqueHover(techniqueId: string, range: vscode.Range): vscode.Hover | undefined {
         const technique = MitreLoader.getTechnique(techniqueId);
+        
         if (!technique) {
-            return new vscode.Hover(
-                new vscode.MarkdownString(`**MITRE ATT&CK Technique**\n\n` +
-                    `**ID:** ${techniqueId}\n\n` +
-                    `*Technique not found in loaded MITRE dataset*\n\n` +
-                    `[View on MITRE ATT&CK](https://attack.mitre.org/techniques/${techniqueId.replace('.', '/')}/)`
-                ),
-                wordRange
-            );
+            // Show basic info even for unknown techniques
+            const markdown = new vscode.MarkdownString();
+            markdown.appendMarkdown(`**${techniqueId}**\n\n`);
+            markdown.appendMarkdown(`*MITRE ATT&CK Technique ID*\n\n`);
+            markdown.appendMarkdown(`⚠️ This technique is not found in the loaded MITRE data.`);
+            return new vscode.Hover(markdown, range);
         }
         
-        return new vscode.Hover(this.createTechniqueHoverContent(technique), wordRange);
-    }
-    
-    private createTacticHover(tacticName: string, wordRange: vscode.Range): vscode.Hover | undefined {
-        const tacticDetails = MitreLoader.getTacticDetails(tacticName);
-        if (!tacticDetails) {
-            // Don't show hover for unrecognized tactic names to avoid false positives
-            return undefined;
-        }
-        
-        return new vscode.Hover(this.createTacticHoverContent(tacticDetails), wordRange);
-    }
-    
-    private createTechniqueHoverContent(technique: any): vscode.MarkdownString {
         const markdown = new vscode.MarkdownString();
-        markdown.isTrusted = true;
         
-        // Header
-        markdown.appendMarkdown(`### 🎯 MITRE ATT&CK Technique\n\n`);
-        markdown.appendMarkdown(`**${technique.id}: ${technique.name}**\n\n`);
+        // Header with framework badge
+        const frameworkBadge = this.getFrameworkBadge(technique.framework);
+        markdown.appendMarkdown(`**${technique.id}: ${technique.name}** ${frameworkBadge}\n\n`);
         
-        // Tactics badges
+        // Description
+        if (technique.description) {
+            markdown.appendMarkdown(`${technique.description}\n\n`);
+        }
+        
+        // Framework information
+        markdown.appendMarkdown(`**Framework:** MITRE ATT&CK ${technique.framework.toUpperCase()}\n\n`);
+        
+        // Tactics
         if (technique.tactics && technique.tactics.length > 0) {
-            const tacticBadges = technique.tactics.map((tactic: string) => `\`${tactic}\``).join(' ');
-            markdown.appendMarkdown(`**Tactics:** ${tacticBadges}\n\n`);
+            markdown.appendMarkdown(`**Tactics:** ${technique.tactics.join(', ')}\n\n`);
         }
         
         // Parent technique for sub-techniques
         if (technique.parent) {
-            const parentTechnique = MitreLoader.getTechnique(technique.parent);
-            const parentName = parentTechnique ? parentTechnique.name : 'Unknown';
-            markdown.appendMarkdown(`**Parent:** ${technique.parent} - ${parentName}\n\n`);
+            markdown.appendMarkdown(`**Parent Technique:** ${technique.parent}\n\n`);
         }
         
-        // Description
-        if (technique.description) {
-            const description = this.cleanDescription(technique.description);
-            markdown.appendMarkdown(`**Description:**\n${description}\n\n`);
+        // Link to MITRE ATT&CK
+        const mitreUrl = this.getMitreUrl(technique.id, technique.framework);
+        if (mitreUrl) {
+            markdown.appendMarkdown(`[View on MITRE ATT&CK](${mitreUrl})`);
         }
         
-        // Links
-        const techniqueUrl = `https://attack.mitre.org/techniques/${technique.id.replace('.', '/')}/`;
-        markdown.appendMarkdown(`---\n`);
-        markdown.appendMarkdown(`[📖 View on MITRE ATT&CK](${techniqueUrl}) | `);
-        markdown.appendMarkdown(`[🔍 Find Sentinel Examples](https://github.com/search?q=${encodeURIComponent(technique.id)}+path%3A*.yaml&type=code)`);
-        
-        return markdown;
+        return new vscode.Hover(markdown, range);
     }
     
-    private createTacticHoverContent(tactic: any): vscode.MarkdownString {
-        const markdown = new vscode.MarkdownString();
-        markdown.isTrusted = true;
+    /**
+     * Creates hover information for MITRE tactics
+     */
+    private createTacticHover(tacticName: string, range: vscode.Range): vscode.Hover | undefined {
+        const tactic = MitreLoader.getTacticDetails(tacticName);
         
-        // Header
-        markdown.appendMarkdown(`### 🎯 MITRE ATT&CK Tactic\n\n`);
-        markdown.appendMarkdown(`**${tactic.name}**\n\n`);
-        
-        // ID if available
-        if (tactic.id) {
-            markdown.appendMarkdown(`**ID:** ${tactic.id}\n\n`);
+        if (!tactic) {
+            // Show basic info even for unknown tactics
+            const markdown = new vscode.MarkdownString();
+            markdown.appendMarkdown(`**${tacticName}**\n\n`);
+            markdown.appendMarkdown(`*MITRE ATT&CK Tactic*\n\n`);
+            markdown.appendMarkdown(`⚠️ This tactic is not found in the loaded MITRE data.`);
+            return new vscode.Hover(markdown, range);
         }
+        
+        const markdown = new vscode.MarkdownString();
+        
+        // Header with framework badge
+        const frameworkBadge = this.getFrameworkBadge(tactic.framework);
+        markdown.appendMarkdown(`**${tactic.name}** ${frameworkBadge}\n\n`);
         
         // Description
         if (tactic.description) {
-            const description = this.cleanDescription(tactic.description);
-            markdown.appendMarkdown(`**Description:**\n${description}\n\n`);
+            markdown.appendMarkdown(`${tactic.description}\n\n`);
         }
+        
+        // Framework information
+        markdown.appendMarkdown(`**Framework:** MITRE ATT&CK ${tactic.framework.toUpperCase()}\n\n`);
         
         // Related techniques
-        const relatedTechniques = MitreLoader.getTechniquesForTactic(tactic.name);
-        if (relatedTechniques && relatedTechniques.length > 0) {
-            const techniqueCount = relatedTechniques.length;
-            markdown.appendMarkdown(`**Related Techniques:** ${techniqueCount} techniques available\n\n`);
+        const techniques = MitreLoader.getTechniquesForTactic(tacticName);
+        if (techniques.length > 0) {
+            markdown.appendMarkdown(`**Related Techniques:** ${techniques.length} techniques\n\n`);
             
-            // Show first few techniques as examples
-            const exampleTechniques = relatedTechniques.slice(0, 3);
-            for (const tech of exampleTechniques) {
-                markdown.appendMarkdown(`• ${tech.id} - ${tech.name}\n`);
+            // Show a few example techniques
+            const exampleTechniques = techniques.slice(0, 5);
+            markdown.appendMarkdown(`*Examples:* ${exampleTechniques.map(t => t.id).join(', ')}`);
+            if (techniques.length > 5) {
+                markdown.appendMarkdown(` (and ${techniques.length - 5} more)`);
             }
-            if (relatedTechniques.length > 3) {
-                markdown.appendMarkdown(`• ... and ${relatedTechniques.length - 3} more\n`);
-            }
-            markdown.appendMarkdown(`\n`);
+            markdown.appendMarkdown('\n\n');
         }
         
-        // Links
-        const tacticUrl = `https://attack.mitre.org/tactics/${tactic.id || 'enterprise'}/`;
-        markdown.appendMarkdown(`---\n`);
-        markdown.appendMarkdown(`[📖 View on MITRE ATT&CK](${tacticUrl}) | `);
-        markdown.appendMarkdown(`[🔍 Find Sentinel Examples](https://github.com/search?q=${encodeURIComponent(tactic.name)}+path%3A*.yaml&type=code)`);
+        // Link to MITRE ATT&CK
+        const mitreUrl = this.getMitreTacticUrl(tactic.id, tactic.framework);
+        if (mitreUrl) {
+            markdown.appendMarkdown(`[View on MITRE ATT&CK](${mitreUrl})`);
+        }
         
-        return markdown;
+        return new vscode.Hover(markdown, range);
     }
     
-    private cleanDescription(description: string): string {
-        if (!description) return '';
-        
-        // Remove citations
-        let cleaned = description.replace(/\(Citation: [^)]+\)/g, '');
-        
-        // Clean up whitespace
-        cleaned = cleaned.replace(/\s+/g, ' ').trim();
-        
-        // Truncate if too long
-        if (cleaned.length > 400) {
-            cleaned = cleaned.substring(0, 400) + '...';
+    /**
+     * Gets a framework badge for display
+     */
+    private getFrameworkBadge(framework: 'enterprise' | 'mobile' | 'ics'): string {
+        switch (framework) {
+            case 'enterprise':
+                return '`Enterprise`';
+            case 'mobile':
+                return '`Mobile`';
+            case 'ics':
+                return '`ICS`';
+            default:
+                return '';
         }
+    }
+    
+    /**
+     * Gets the MITRE ATT&CK URL for a technique
+     */
+    private getMitreUrl(techniqueId: string, framework: 'enterprise' | 'mobile' | 'ics'): string | null {
+        const baseUrls = {
+            enterprise: 'https://attack.mitre.org/techniques',
+            mobile: 'https://attack.mitre.org/techniques',
+            ics: 'https://attack.mitre.org/techniques'
+        };
         
-        return cleaned;
+        const baseUrl = baseUrls[framework];
+        if (!baseUrl) return null;
+        
+        // Convert T1234.567 to T1234/567 for URL
+        const urlId = techniqueId.replace('.', '/');
+        return `${baseUrl}/${urlId}/`;
+    }
+    
+    /**
+     * Gets the MITRE ATT&CK URL for a tactic
+     */
+    private getMitreTacticUrl(tacticId: string, framework: 'enterprise' | 'mobile' | 'ics'): string | null {
+        if (!tacticId) return null;
+        
+        const baseUrls = {
+            enterprise: 'https://attack.mitre.org/tactics',
+            mobile: 'https://attack.mitre.org/tactics',
+            ics: 'https://attack.mitre.org/tactics'
+        };
+        
+        const baseUrl = baseUrls[framework];
+        if (!baseUrl) return null;
+        
+        return `${baseUrl}/${tacticId}/`;
     }
 }

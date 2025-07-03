@@ -259,6 +259,23 @@
           ],
           "description": "MITRE ATT&CK framework version to use for validation"
         },
+        "sentinelRules.mitre.frameworks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "enterprise",
+              "mobile",
+              "ics"
+            ]
+          },
+          "default": [
+            "enterprise",
+            "mobile",
+            "ics"
+          ],
+          "description": "MITRE ATT&CK frameworks to load and validate against"
+        },
         "sentinelRules.connectors.validationMode": {
           "type": "string",
           "enum": [
