@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { v4 as uuidv4 } from 'uuid'; // Already imported
 import { SentinelRuleFormatter } from '../formatting/formatter';
 import { SentinelRuleValidator } from '../validation/validator';
 import { ArmToYamlConverter, ConversionOptions } from '../conversion/armToYamlConverter';
@@ -66,6 +67,11 @@ export class CommandManager {
         // Command: Validate All Workspace Rules
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.validateWorkspace', this.validateWorkspace.bind(this))
+        );
+
+        // NEW: Regenerate GUID command
+        disposables.push(
+            vscode.commands.registerCommand('sentinelRules.regenerateGuid', this.regenerateGuid.bind(this))
         );
 
         return disposables;
@@ -175,14 +181,17 @@ export class CommandManager {
         }
 
         try {
-            await vscode.workspace.fs.writeFile(targetUri, Buffer.from(template, 'utf8'));
+            // Replace {{GUID}} placeholder with actual GUID
+            const processedTemplate = template.replace(/\{\{GUID\}\}/g, uuidv4());
+            
+            await vscode.workspace.fs.writeFile(targetUri, Buffer.from(processedTemplate, 'utf8'));
             const document = await vscode.workspace.openTextDocument(targetUri);
             
             // Explicitly set language to YAML to prevent auto-detection of custom language
             await vscode.languages.setTextDocumentLanguage(document, 'yaml');
             
             await vscode.window.showTextDocument(document);
-            vscode.window.showInformationMessage(`New ${defaultFilename} template created!`);
+            vscode.window.showInformationMessage(`New ${defaultFilename} template created with unique GUID!`);
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to create template: ${error}`);
         }
@@ -418,15 +427,111 @@ export class CommandManager {
     }
 
     /**
-     * Generate template at specific location
+     * Generate template at specific location with GUID replacement
      */
     private async generateTemplateAtLocation(templateKey: string, filePath: string): Promise<void> {
         try {
             const template = await SentinelRuleFormatter.loadTemplate(templateKey);
-            await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(template, 'utf8'));
+            
+            // Replace {{GUID}} placeholder with actual GUID
+            const processedTemplate = template.replace(/\{\{GUID\}\}/g, uuidv4());
+            
+            await vscode.workspace.fs.writeFile(vscode.Uri.file(filePath), Buffer.from(processedTemplate, 'utf8'));
         } catch (error) {
             throw new Error(`Failed to load or create template: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+    }
+
+    /**
+     * NEW: Regenerate GUID in the current Sentinel rule
+     */
+    private async regenerateGuid(): Promise<void> {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showErrorMessage('No active editor found');
+            return;
+        }
+
+        const document = editor.document;
+        
+        // Validate this is a YAML file
+        if (!document.fileName.match(/\.(yaml|yml)$/)) {
+            vscode.window.showErrorMessage('This command only works on YAML files');
+            return;
+        }
+
+        try {
+            const text = document.getText();
+            const guidRegex = /^(\s*)id:\s*([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}|\{\{GUID\}\})/im;
+            const match = text.match(guidRegex);
+
+            if (!match) {
+                // No existing GUID found, ask user if they want to add one
+                const addGuid = await vscode.window.showWarningMessage(
+                    'No GUID found in this file. Would you like to add an ID field at the top?',
+                    'Yes', 'No'
+                );
+                
+                if (addGuid === 'Yes') {
+                    await this.addGuidToFile(editor);
+                }
+                return;
+            }
+
+            const currentGuid = match[2];
+            const indentation = match[1];
+            
+            // Show confirmation dialog with current GUID
+            const action = await vscode.window.showWarningMessage(
+                `Replace current GUID?\n\nCurrent: ${currentGuid}\nNew: ${uuidv4()}`,
+                { modal: true },
+                'Replace GUID', 'Cancel'
+            );
+
+            if (action === 'Replace GUID') {
+                const newGuid = uuidv4();
+                const newText = text.replace(guidRegex, `${indentation}id: ${newGuid}`);
+                
+                // Apply the change
+                const fullRange = new vscode.Range(
+                    document.positionAt(0),
+                    document.positionAt(text.length)
+                );
+
+                await editor.edit(editBuilder => {
+                    editBuilder.replace(fullRange, newText);
+                });
+
+                vscode.window.showInformationMessage(`GUID regenerated successfully!\nNew ID: ${newGuid}`);
+            }
+
+        } catch (error) {
+            console.error('Error regenerating GUID:', error);
+            vscode.window.showErrorMessage(`Failed to regenerate GUID: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
+
+    /**
+     * Add GUID field to file that doesn't have one
+     */
+    private async addGuidToFile(editor: vscode.TextEditor): Promise<void> {
+        const document = editor.document;
+        const text = document.getText();
+        const newGuid = uuidv4();
+        
+        // Insert at the beginning of the file
+        const newText = `id: ${newGuid}\n${text}`;
+        
+        const fullRange = new vscode.Range(
+            document.positionAt(0),
+            document.positionAt(text.length)
+        );
+
+        await editor.edit(editBuilder => {
+            editBuilder.replace(fullRange, newText);
+        });
+
+        vscode.window.showInformationMessage(`GUID added successfully!\nNew ID: ${newGuid}`);
     }
 }
 
