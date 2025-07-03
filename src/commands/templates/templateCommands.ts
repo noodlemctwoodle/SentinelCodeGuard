@@ -9,9 +9,14 @@ export class TemplateCommands extends BaseCommand {
     public registerCommands(): vscode.Disposable[] {
         const disposables: vscode.Disposable[] = [];
 
-        // Enhanced template creation command
+        // Enhanced template creation command (for context menus)
         disposables.push(
             vscode.commands.registerCommand('sentinelRules.createSentinelRule', this.createSentinelRuleWorkflow.bind(this))
+        );
+
+        // Unified template command for command palette
+        disposables.push(
+            vscode.commands.registerCommand('sentinelRules.generateRuleTemplate', this.createSentinelRuleWorkflow.bind(this))
         );
 
         // Legacy template commands for backward compatibility

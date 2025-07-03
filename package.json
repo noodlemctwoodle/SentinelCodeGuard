@@ -90,6 +90,11 @@
         "category": "Sentinel Rules"
       },
       {
+        "command": "sentinelRules.generateRuleTemplate",
+        "title": "Generate Rule Template",
+        "category": "Sentinel Rules"
+      },
+      {
         "command": "sentinelRules.regenerateGuid",
         "title": "Generate New Rule ID",
         "category": "Sentinel Rules"
@@ -181,7 +186,11 @@
           "when": "resourceExtname == .yaml"
         },
         {
-          "command": "sentinelRules.createSentinelRule"
+          "command": "sentinelRules.createSentinelRule",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateRuleTemplate"
         },
         {
           "command": "sentinelRules.regenerateGuid",
@@ -200,6 +209,26 @@
         {
           "command": "sentinelRules.convertArmToYaml",
           "when": "config.sentinelRules.conversion.enabled"
+        },
+        {
+          "command": "sentinelRules.generateTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateAdvancedTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateNRTTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateBehaviorAnalyticsTemplate",
+          "when": "false"
+        },
+        {
+          "command": "sentinelRules.generateMinimalTemplate",
+          "when": "false"
         }
       ]
     },
