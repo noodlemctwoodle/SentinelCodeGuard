@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.9-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.10-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **Development toolkit for Microsoft Sentinel Analytics Rules**
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.9).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.10).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -60,6 +60,32 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 ---
 
 ## 📈 Recent Updates
+
+### v0.0.10 (2025-07-03)
+
+#### 🔌 Comprehensive Data Connector Validation
+
+- **Official Sentinel Connector Database** - Validates against the complete catalog of Microsoft Sentinel data connectors from Content Hub
+- **Smart Connector Suggestions** - Intelligent autocomplete for connector IDs with descriptions and categories  
+- **Data Type Validation** - Comprehensive validation of data types (tables) for each connector with helpful suggestions
+- **Custom Connector Support** - Full support for custom and codeless connectors alongside official ones
+- **Enhanced Error Messages** - Clear, actionable validation messages with suggested alternatives for misspelled connectors
+- **Category-Based Organization** - Connectors grouped by categories (Cloud, Network, Security, etc.) for easier discovery
+
+#### 📊 Improved IntelliSense & Hover Information
+
+- **Rich Connector Details** - Hover over connector IDs to see descriptions, categories, and available data types
+- **Data Type Tooltips** - Hover over data types to see which connectors provide them
+- **Always-Fresh Data** - Connector information automatically updated from official Microsoft sources
+- **Deprecation Warnings** - Alerts for deprecated connectors with migration guidance
+- **Smart Completion** - Context-aware suggestions that understand your rule requirements
+
+#### 🎯 Enhanced User Experience
+
+- **Eliminated False Positives** - No more "unknown connector" errors for valid Microsoft connectors
+- **Faster Development** - Instant validation and suggestions reduce time spent looking up connector documentation
+- **Professional Validation** - Enterprise-grade validation using the same data sources as Azure Portal
+- **Backward Compatibility** - Existing rules continue to work while benefiting from enhanced validation
 
 ### v0.0.9 (2025-07-03)
 

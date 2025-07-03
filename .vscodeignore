@@ -9,6 +9,9 @@ eslint.config.js
 .github/**
 *.vsix
 
+# Build and development scripts
+scripts/**
+
 # Node modules that aren't needed at runtime
 node_modules/**/test/**
 node_modules/**/tests/**

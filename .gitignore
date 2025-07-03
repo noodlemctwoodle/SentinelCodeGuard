@@ -9,8 +9,10 @@ out/
 
 # VS Code extension files
 *.vsix
+.vscode
 .vscode-test/
 .vscode-test-web/
+
 
 # VS Code workspace settings (but keep launch.json and tasks.json for development)
 .vscode/settings.json
@@ -143,6 +145,7 @@ docs/_build/
 
 # Local development files
 .local/
+.internal
 local/
-
+temp
 SentinelCodeGuard.code-workspace
