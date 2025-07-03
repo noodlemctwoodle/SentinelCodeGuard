@@ -2,7 +2,7 @@
   "name": "sentinelcodeguard",
   "displayName": "SentinelCodeGuard (Beta)",
   "description": "Professional development toolkit for Microsoft Sentinel Analytics Rules with intelligent validation, formatting, and comprehensive templates (Beta Version)",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "publisher": "noodlemctwoodle",
   "icon": "images/icon.png",
   "engines": {
@@ -90,6 +90,11 @@
         "category": "Sentinel Rules"
       },
       {
+        "command": "sentinelRules.regenerateGuid",
+        "title": "Regenerate Rule GUID",
+        "category": "Sentinel Rules"
+      },
+      {
         "command": "sentinelRules.generateTemplate",
         "title": "Generate Standard Rule Template",
         "category": "Sentinel Rules"
@@ -138,9 +143,14 @@
           "group": "sentinel@2"
         },
         {
+          "when": "resourceExtname == .yaml && resourceFilename =~ /.*\\.sentinel\\.(yaml|yml)$/",
+          "command": "sentinelRules.regenerateGuid",
+          "group": "sentinel@3"
+        },
+        {
           "when": "resourceExtname == .json && config.sentinelRules.conversion.enabled",
           "command": "sentinelRules.convertArmToYaml",
-          "group": "sentinel@3"
+          "group": "sentinel@4"
         }
       ],
       "explorer/context": [
@@ -162,6 +172,10 @@
         },
         {
           "command": "sentinelRules.createSentinelRule"
+        },
+        {
+          "command": "sentinelRules.regenerateGuid",
+          "when": "resourceExtname == .yaml"
         },
         {
           "command": "sentinelRules.formatRule",

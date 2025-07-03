@@ -1,8 +1,8 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.8-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.9-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
-**A development toolkit for Microsoft Sentinel Analytics Rules**
+**Development toolkit for Microsoft Sentinel Analytics Rules**
 
 *Guard your Sentinel rules with precision*
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.8).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.9).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -62,6 +62,30 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 
 ## 📈 Recent Updates
 
+### v0.0.9 (2025-07-03)
+
+#### 🆔 GUID Management Features
+
+- **Regenerate Rule GUID** - Right-click on YAML files to replace existing GUIDs with new ones
+- **Add Missing GUID** - Automatically detect files without GUIDs and offer to add them
+- **Smart GUID Detection** - Recognises both actual GUIDs and template placeholders (`{{GUID}}`)
+- **Confirmation Dialogs** - Preview old and new GUIDs before replacement
+- **Auto-GUID Templates** - All new templates automatically replace `{{GUID}}` placeholders with real UUIDs
+
+#### 🛠️ Enhanced Template Experience
+
+- **Unique IDs for Every Template** - No more duplicate GUIDs when creating multiple templates
+- **Proper Indentation Preservation** - GUID replacement maintains YAML formatting
+- **Context Menu Integration** - "Regenerate Rule GUID" available via right-click
+- **Bulk Template Creation** - Each template gets a unique GUID automatically
+
+#### 🎯 Developer Productivity
+
+- **Quick GUID Regeneration** - Perfect for duplicating existing rules
+- **Template-to-Production** - Convert templates with placeholder GUIDs to production-ready rules
+- **Rule Duplication Workflow** - Copy existing rules and generate new GUIDs instantly
+- **Error Prevention** - Ensures unique identifiers across rule sets
+
 ### v0.0.8 (2025-07-02)
 
 #### 🎯 Enhanced Template Creation Workflow
@@ -86,35 +110,6 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 - **Template-specific filenames** following established naming conventions
 - **Support for both extensions** (.yaml and .yml)
 - **Comprehensive template library** covering all Sentinel rule scenarios
-
-=======
-### v0.0.7 (2025-07-01)
-
-#### 🎯 Enhanced MITRE ATT&CK Integration
-- **Full MITRE ATT&CK v16 dataset** integrated as single source of truth
-- **Rich hover provider** for techniques and tactics with detailed information
-- **Context-aware hovers** that only trigger on actual MITRE fields
-- **Comprehensive technique/tactic validation** with auto-correction
-
-#### 🔧 Improved Formatting & Validation
-
-- **Rule-type-specific validation** for Scheduled vs NRT rules
-- **Enhanced duration handling** including `lookbackDuration` field support
-- **Better field ordering** with `lookbackDuration` positioned correctly
-- **Improved error handling** and YAML repair functionality
-
-#### 🔄 ARM Conversion Enhancements
-
-- **Renamed context menu** to "Decompile ARM to YAML" for clarity
-- **Lowercase filename generation** for consistency
-- **Improved command registration** and context menu integration
-- **Better error handling** during conversion process
-
-#### 🛠️ Developer Experience
-- **Cleaner validation logic** with unused imports removed
-- **Refactored required fields** logic for maintainability
-- **Enhanced TypeScript support** with proper type definitions
-- **Improved code organization** and documentation
 
 [View Full Changelog](https://github.com/noodlemctwoodle/SentinelCodeGuard/wiki/Change-Log)
 
