@@ -452,6 +452,6 @@
   "dependencies": {
     "js-yaml": "^4.1.0",
     "jsonschema": "^1.4.1",
-    "uuid": "^9.0.0"
+    "uuid": "^11.1.0"
   }
 }
