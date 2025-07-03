@@ -9,6 +9,7 @@ out/
 
 # VS Code extension files
 *.vsix
+.vscode
 .vscode-test/
 .vscode-test-web/
 

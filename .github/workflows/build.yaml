@@ -1,41 +1,203 @@
-name: Build and Test
+name: Build and Package Extension
 
-on: 
+on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      force_data_update:
+        description: 'Force update of MITRE and Connector data'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
         
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
+    - name: Create data directory
+      run: mkdir -p data
+      
+    - name: Download latest MITRE ATT&CK data
+      run: |
+        echo "📥 Downloading latest MITRE ATT&CK Framework data..."
+        
+        # Download Enterprise ATT&CK (v16)
+        echo "🏢 Downloading Enterprise ATT&CK..."
+        curl -fsSL -o data/mitre-v16.json \
+          "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
+        echo "✅ Enterprise ATT&CK downloaded ($(du -h data/mitre-v16.json | cut -f1))"
+        
+        # Download Mobile ATT&CK
+        echo "📱 Downloading Mobile ATT&CK..."
+        curl -fsSL -o data/mitre-mobile.json \
+          "https://raw.githubusercontent.com/mitre/cti/master/mobile-attack/mobile-attack.json"
+        echo "✅ Mobile ATT&CK downloaded ($(du -h data/mitre-mobile.json | cut -f1))"
+        
+        # Download ICS ATT&CK
+        echo "🏭 Downloading ICS ATT&CK..."
+        curl -fsSL -o data/mitre-ics.json \
+          "https://raw.githubusercontent.com/mitre/cti/master/ics-attack/ics-attack.json"
+        echo "✅ ICS ATT&CK downloaded ($(du -h data/mitre-ics.json | cut -f1))"
+        
+        echo "📊 MITRE ATT&CK data download summary:"
+        echo "Enterprise: $(jq '.objects | length' data/mitre-v16.json) objects"
+        echo "Mobile: $(jq '.objects | length' data/mitre-mobile.json) objects"
+        echo "ICS: $(jq '.objects | length' data/mitre-ics.json) objects"
+      
+    - name: Extract latest Sentinel connector data
+      shell: pwsh
+      run: |
+        Write-Host "🔌 Extracting Azure Sentinel connector data..."
+        
+        # Change to the scripts directory where the script is located
+        Set-Location scripts
+        
+        # Run the connector extraction script
+        ./Extract-SentinelConnectors.ps1 -OutputPath "../data/connectors.json"
+        
+        # Return to root directory
+        Set-Location ..
+        
+        # Verify the output
+        if (Test-Path "data/connectors.json") {
+            $connectorData = Get-Content "data/connectors.json" | ConvertFrom-Json
+            Write-Host "✅ Connector data extracted successfully"
+            Write-Host "📊 Total connectors: $($connectorData.metadata.totalConnectors)"
+            Write-Host "📊 Total tables: $($connectorData.metadata.totalTables)"
+            Write-Host "📅 Generated: $($connectorData.metadata.generatedDate)"
+        } else {
+            Write-Error "❌ Failed to generate connector data"
+            exit 1
+        }
+      
+    - name: Validate data files
+      run: |
+        echo "🔍 Validating downloaded data files..."
+        
+        # Check MITRE files
+        for file in data/mitre-*.json; do
+          if [[ -f "$file" ]]; then
+            if jq empty "$file" 2>/dev/null; then
+              echo "✅ $file is valid JSON"
+            else
+              echo "❌ $file is invalid JSON"
+              exit 1
+            fi
+          else
+            echo "❌ $file not found"
+            exit 1
+          fi
+        done
+        
+        # Check connector file
+        if [[ -f "data/connectors.json" ]]; then
+          if jq empty "data/connectors.json" 2>/dev/null; then
+            echo "✅ data/connectors.json is valid JSON"
+          else
+            echo "❌ data/connectors.json is invalid JSON"
+            exit 1
+          fi
+        else
+          echo "❌ data/connectors.json not found"
+          exit 1
+        fi
+        
+        echo "🎉 All data files validated successfully"
+      
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm test
+      
+    - name: Compile TypeScript
+      run: npm run compile
+      
+    - name: Package extension
+      run: |
+        npm install -g @vscode/vsce
+        vsce package --out sentinelcodeguard.vsix
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: extension-package
+        path: |
+          sentinelcodeguard.vsix
+          data/*.json
+        retention-days: 30
+        
+    - name: Upload data files as artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: updated-data-files
+        path: data/*.json
+        retention-days: 90
+
+  # Optional: Separate job for manual data updates via PR
+  update-data-only:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.force_data_update == 'true'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Create data directory
+      run: mkdir -p data
+      
+    - name: Download latest MITRE ATT&CK data
+      run: |
+        echo "📥 Force updating MITRE ATT&CK data..."
+        curl -fsSL -o data/mitre-v16.json "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
+        curl -fsSL -o data/mitre-mobile.json "https://raw.githubusercontent.com/mitre/cti/master/mobile-attack/mobile-attack.json"
+        curl -fsSL -o data/mitre-ics.json "https://raw.githubusercontent.com/mitre/cti/master/ics-attack/ics-attack.json"
+        
+    - name: Extract latest Sentinel connector data
+      shell: pwsh
+      run: |
+        Set-Location scripts
+        ./Extract-SentinelConnectors.ps1 -OutputPath "../data/connectors.json"
+        
+    - name: Create Pull Request with updated data
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: |
+          chore: update MITRE ATT&CK and Sentinel connector data
           
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Lint code
-        run: npm run lint:check
-        
-      - name: Compile TypeScript
-        run: npm run compile
-        
-      - name: Package extension
-        run: npm run package
-        
-      - name: Upload VSIX artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: sentinelcodeguard-vsix
-          path: '*.vsix'
-          retention-days: 7
+          Auto-generated data update including:
+          - MITRE Enterprise, Mobile, and ICS ATT&CK frameworks
+          - Azure Sentinel connector data from Content Hub
+        title: "chore: Update MITRE and Sentinel data files"
+        body: |
+          ## Automated Data Update
+          
+          This PR contains updated data files:
+          
+          ### MITRE ATT&CK Framework
+          - ✅ Enterprise ATT&CK (mitre-v16.json)
+          - ✅ Mobile ATT&CK (mitre-mobile.json)  
+          - ✅ ICS ATT&CK (mitre-ics.json)
+          
+          ### Azure Sentinel Connectors
+          - ✅ Content Hub connector data (connectors.json)
+          
+          These files are automatically generated from official sources and provide the latest threat intelligence and connector information for the extension.
+          
+          **Auto-generated by GitHub Actions**
+        branch: update-data-files
+        delete-branch: true
