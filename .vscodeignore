@@ -27,8 +27,6 @@ Thumbs.db
 # Documentation
 docs/**
 examples/**
-README.md
-LICENSE.txt
 
 # Keep only the bundled output and essential files
 !dist/**
