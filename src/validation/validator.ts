@@ -337,7 +337,7 @@ export class SentinelRuleValidator {
                     
                     // Validate individual data types if connector is known
                     if (connector.dataTypes && Array.isArray(connector.dataTypes)) {
-                        connector.dataTypes.forEach((dataType: string, dtIndex: number) => {
+                        connector.dataTypes.forEach((dataType: string, _dtIndex: number) => {
                             if (validation.dataTypeValidation.invalidDataTypes.includes(dataType)) {
                                 const line = this.findFieldLine(lines, `requiredDataConnectors[${index}].dataTypes`, dataType);
                                 if (line !== -1) {
