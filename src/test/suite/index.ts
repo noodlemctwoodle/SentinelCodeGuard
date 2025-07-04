@@ -1,10 +1,10 @@
 import * as path from 'path';
-import * as glob from 'glob';
+import { glob } from 'glob';
 
 // Use require for Mocha to avoid constructor issues
 const Mocha = require('mocha');
 
-export function run(): Promise<void> {
+export async function run(): Promise<void> {
     // Create the mocha test
     const mocha = new Mocha({
         ui: 'tdd',
@@ -14,16 +14,14 @@ export function run(): Promise<void> {
 
     const testsRoot = path.resolve(__dirname, '..');
 
-    return new Promise((resolve, reject) => {
-        // Use callback-style glob with proper typing
-        glob.glob('**/**.test.js', { cwd: testsRoot }, (err: Error | null, files: string[]) => {
-            if (err) {
-                return reject(err);
-            }
+    try {
+        // Use promise-based glob (new API in v11)
+        const files = await glob('**/**.test.js', { cwd: testsRoot });
+        
+        // Add files to the test suite
+        files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 
-            // Add files to the test suite
-            files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
-
+        return new Promise((resolve, reject) => {
             try {
                 // Run the mocha test with explicit type annotation
                 mocha.run((failures: number) => {
@@ -38,5 +36,7 @@ export function run(): Promise<void> {
                 reject(err);
             }
         });
-    });
+    } catch (err) {
+        throw new Error(`Failed to find test files: ${err}`);
+    }
 }
