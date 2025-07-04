@@ -10,9 +10,17 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Default permissions for the workflow (most restrictive)
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # Explicit permissions for build job (read-only)
+    permissions:
+      contents: read
     
     strategy:
       matrix:
@@ -50,6 +58,12 @@ jobs:
   update-data-on-main:
     runs-on: ubuntu-latest
     needs: build
+    
+    # Explicit permissions for data update job (needs write access)
+    permissions:
+      contents: write        # Required to push commits and checkout code
+      pull-requests: write   # Required to create pull requests
+    
     # Update data when pushing to main (merges) OR on schedule/manual trigger
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     
