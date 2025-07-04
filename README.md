@@ -1,6 +1,6 @@
 # SentinelCodeGuard
 
-![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.10-blue) ![License](https://img.shields.io/badge/license-MIT-green)
+![Beta](https://img.shields.io/badge/status-beta-orange) ![Version](https://img.shields.io/badge/version-0.0.11-blue) ![License](https://img.shields.io/badge/license-MIT-green)
 
 **Development toolkit for Microsoft Sentinel Analytics Rules**
 
@@ -21,7 +21,7 @@
 
 ## Beta Notice
 
-**SentinelCodeGuard is currently in beta (v0.0.10).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
+**SentinelCodeGuard is currently in beta (v0.0.11).** We're actively developing and improving the extension. Please report any issues or feedback via [GitHub Issues](https://github.com/noodlemctwoodle/SentinelCodeGuard/issues).
 
 ---
 
@@ -60,6 +60,23 @@ Created by **TobyG** - Visit [sentinel.blog](https://sentinel.blog) for more Mic
 ---
 
 ## 📈 Recent Updates
+
+### v0.0.11 (2025-07-04)
+
+#### ⚡ Performance & Security Enhancements
+
+- **Optimized Validation Engine** - Significantly improved rule validation performance with streamlined data processing
+- **Enhanced Security Framework** - Strengthened dependency management and updated security protocols
+- **Updated Dependencies** - Latest security patches and compatibility improvements for all core libraries
+
+#### 🔧 Infrastructure Improvements
+
+- **Modernized Build Pipeline** - Updated CI/CD workflows for more reliable builds and releases
+- **Enhanced Test Coverage** - Comprehensive test suite improvements ensuring higher code quality
+
+#### 🎯 User Experience Refinements
+
+- **Better Resource Management** - Optimized background processes for seamless development experience
 
 ### v0.0.10 (2025-07-03)
 
