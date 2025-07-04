@@ -164,10 +164,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Lint and compile
+      - name: Lint, build and test
         run: |
           npm run lint:check
-          npm run compile
+          npm run compile  
+          npm run webpack
+          npm test
           
       - name: Package extension
         run: npm run package

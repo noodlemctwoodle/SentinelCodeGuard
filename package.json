@@ -41,7 +41,7 @@
     "url": "https://github.com/noodlemctwoodle/SentinelCodeGuard/issues"
   },
   "license": "MIT",
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "activationEvents": [
     "onLanguage:yaml"
   ],
@@ -426,10 +426,13 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run webpack",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "webpack": "webpack --mode production --devtool hidden-source-map",
+    "webpack-dev": "webpack --mode development --watch",
+    "compile-tests": "tsc -p . --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts --fix",
     "lint:check": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js",
@@ -438,7 +441,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
+    "@types/glob": "^8.1.0",
     "@types/js-yaml": "^4.0.9",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.0.10",
     "@types/uuid": "^10.0.0",
     "@types/vscode": "^1.101.0",
@@ -447,11 +452,12 @@
     "@vscode/test-electron": "^2.4.2",
     "@vscode/vsce": "^3.6.0",
     "eslint": "^9.30.1",
-    "typescript": "^5.8.3",
-    "@types/mocha": "^10.0.10",
-    "mocha": "^11.7.1",
     "glob": "^11.0.0",
-    "@types/glob": "^8.1.0"
+    "mocha": "^11.7.1",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1"
   },
   "dependencies": {
     "js-yaml": "^4.1.0",
