@@ -1,89 +1,101 @@
-name: Build and Package Extension
+name: Build and Update Data
 
 on:
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC to keep data fresh
+    - cron: '0 2 * * 0'
+  workflow_dispatch: # Allow manual triggering
   push:
     branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-    inputs:
-      force_data_update:
-        description: 'Force update of MITRE and Connector data'
-        required: false
-        default: false
-        type: boolean
+    branches: [ main, develop ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
-    - name: Create data directory
-      run: mkdir -p data
+    - name: Install dependencies
+      run: npm ci
       
-    - name: Download latest MITRE ATT&CK data
-      run: |
-        echo "📥 Downloading latest MITRE ATT&CK Framework data..."
+    - name: Compile TypeScript
+      run: npm run compile
+      
+    - name: Run linter
+      run: npm run lint:check
+      
+    - name: Run tests
+      run: npm test
+      
+    - name: Package extension
+      run: npm run package
+
+  update-data-on-main:
+    runs-on: ubuntu-latest
+    needs: build
+    # Update data when pushing to main (merges) OR on schedule/manual trigger
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
         
-        # Download Enterprise ATT&CK (v16)
-        echo "🏢 Downloading Enterprise ATT&CK..."
-        curl -fsSL -o data/mitre-v16.json \
-          "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.x
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Download latest MITRE ATT&CK Enterprise data
+      run: |
+        echo "📥 Downloading latest MITRE ATT&CK Enterprise data..."
+        curl -fsSL -o data/mitre-v16.json https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json
         echo "✅ Enterprise ATT&CK downloaded ($(du -h data/mitre-v16.json | cut -f1))"
         
-        # Download Mobile ATT&CK
-        echo "📱 Downloading Mobile ATT&CK..."
-        curl -fsSL -o data/mitre-mobile.json \
-          "https://raw.githubusercontent.com/mitre/cti/master/mobile-attack/mobile-attack.json"
+    - name: Download latest MITRE ATT&CK Mobile data
+      run: |
+        echo "📱 Downloading latest MITRE ATT&CK Mobile data..."
+        curl -fsSL -o data/mitre-mobile.json https://raw.githubusercontent.com/mitre/cti/master/mobile-attack/mobile-attack.json
         echo "✅ Mobile ATT&CK downloaded ($(du -h data/mitre-mobile.json | cut -f1))"
         
-        # Download ICS ATT&CK
-        echo "🏭 Downloading ICS ATT&CK..."
-        curl -fsSL -o data/mitre-ics.json \
-          "https://raw.githubusercontent.com/mitre/cti/master/ics-attack/ics-attack.json"
+    - name: Download latest MITRE ATT&CK ICS data
+      run: |
+        echo "🏭 Downloading latest MITRE ATT&CK ICS data..."
+        curl -fsSL -o data/mitre-ics.json https://raw.githubusercontent.com/mitre/cti/master/ics-attack/ics-attack.json
         echo "✅ ICS ATT&CK downloaded ($(du -h data/mitre-ics.json | cut -f1))"
         
-        echo "📊 MITRE ATT&CK data download summary:"
-        echo "Enterprise: $(jq '.objects | length' data/mitre-v16.json) objects"
-        echo "Mobile: $(jq '.objects | length' data/mitre-mobile.json) objects"
-        echo "ICS: $(jq '.objects | length' data/mitre-ics.json) objects"
-      
     - name: Extract latest Sentinel connector data
       shell: pwsh
       run: |
-        Write-Host "🔌 Extracting Azure Sentinel connector data..."
-        
-        # Change to the scripts directory where the script is located
+        echo "🔌 Extracting Azure Sentinel connector data..."
         Set-Location scripts
-        
-        # Run the connector extraction script
         ./Extract-SentinelConnectors.ps1 -OutputPath "../data/connectors.json"
-        
-        # Return to root directory
         Set-Location ..
-        
-        # Verify the output
         if (Test-Path "data/connectors.json") {
             $connectorData = Get-Content "data/connectors.json" | ConvertFrom-Json
             Write-Host "✅ Connector data extracted successfully"
             Write-Host "📊 Total connectors: $($connectorData.metadata.totalConnectors)"
             Write-Host "📊 Total tables: $($connectorData.metadata.totalTables)"
-            Write-Host "📅 Generated: $($connectorData.metadata.generatedDate)"
-        } else {
-            Write-Error "❌ Failed to generate connector data"
-            exit 1
         }
-      
-    - name: Validate data files
+
+    - name: Validate downloaded data
       run: |
         echo "🔍 Validating downloaded data files..."
         
@@ -92,6 +104,7 @@ jobs:
           if [[ -f "$file" ]]; then
             if jq empty "$file" 2>/dev/null; then
               echo "✅ $file is valid JSON"
+              echo "📊 $(basename $file): $(jq '.objects | length' "$file") objects"
             else
               echo "❌ $file is invalid JSON"
               exit 1
@@ -114,73 +127,30 @@ jobs:
           echo "❌ data/connectors.json not found"
           exit 1
         fi
-        
-        echo "🎉 All data files validated successfully"
-      
-    - name: Install dependencies
-      run: npm ci
-      
-    # TODO: Re-enable tests in future release after test infrastructure is properly set up
-    # - name: Run tests
-    #   run: npm test
-    
-    - name: Skip tests (temporarily disabled)
-      run: |
-        echo "⚠️  Tests temporarily disabled for v0.0.10 release"
-        echo "📋 Test infrastructure will be implemented in future release"
-        echo "✅ Proceeding with build without test execution"
-      
-    - name: Compile TypeScript
-      run: npm run compile
-      
-    - name: Package extension
-      run: |
-        npm install -g @vscode/vsce
-        vsce package --out sentinelcodeguard.vsix
-      
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: extension-package
-        path: |
-          sentinelcodeguard.vsix
-          data/*.json
-        retention-days: 30
-        
-    - name: Upload data files as artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: updated-data-files
-        path: data/*.json
-        retention-days: 90
 
-  # Optional: Separate job for manual data updates via PR
-  update-data-only:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.force_data_update == 'true'
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Create data directory
-      run: mkdir -p data
-      
-    - name: Download latest MITRE ATT&CK data
+    - name: Check for data changes
+      id: changes
       run: |
-        echo "📥 Force updating MITRE ATT&CK data..."
-        curl -fsSL -o data/mitre-v16.json "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
-        curl -fsSL -o data/mitre-mobile.json "https://raw.githubusercontent.com/mitre/cti/master/mobile-attack/mobile-attack.json"
-        curl -fsSL -o data/mitre-ics.json "https://raw.githubusercontent.com/mitre/cti/master/ics-attack/ics-attack.json"
-        
-    - name: Extract latest Sentinel connector data
-      shell: pwsh
+        git diff --quiet data/ || echo "changes=true" >> $GITHUB_OUTPUT
+
+    - name: Commit updated data directly to main
+      if: steps.changes.outputs.changes == 'true' && (github.event_name == 'push' && github.ref == 'refs/heads/main')
       run: |
-        Set-Location scripts
-        ./Extract-SentinelConnectors.ps1 -OutputPath "../data/connectors.json"
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        git commit -m "chore: update MITRE ATT&CK and Sentinel connector data
+
+        Auto-generated data update including:
+        - MITRE Enterprise, Mobile, and ICS ATT&CK frameworks  
+        - Azure Sentinel connector data from Content Hub
+
+        Updated after merge to main to ensure latest threat intelligence data."
+        git push
         
-    - name: Create Pull Request with updated data
-      uses: peter-evans/create-pull-request@v5
+    - name: Create Pull Request with updated data (scheduled/manual runs)
+      if: steps.changes.outputs.changes == 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+      uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: |
