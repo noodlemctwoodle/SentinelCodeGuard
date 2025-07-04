@@ -218,7 +218,7 @@ export class GuidCommands extends BaseCommand {
             }, async (progress) => {
                 let processedFiles = 0;
                 let updatedFiles = 0;
-                let errors: string[] = [];
+                const errors: string[] = [];
 
                 for (const file of filesWithGuids) {
                     try {

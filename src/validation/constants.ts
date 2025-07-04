@@ -180,20 +180,21 @@ export const VALIDATION_PATTERNS = {
     // Semantic version format (e.g., 1.0.0)
     VERSION: /^[0-9]+\.[0-9]+\.[0-9]+$/,
     
-    // ISO 8601 duration format (e.g., PT5M, P1D)
-    ISO_DURATION: /^P(?:(?:[0-9]+D)?(?:T(?:[0-9]+H)?(?:[0-9]+M)?(?:[0-9]+S)?)?|(?:[0-9]+W))$/,
+    // ISO 8601 duration format for Sentinel Analytics Rules (e.g., PT5M, P1D, PT1H30M)
+    // Supports only Days (D), Hours (H), and Minutes (M)
+    ISO_DURATION: /^P(?:[0-9]+D(?:T(?:[0-9]+H)?(?:[0-9]+M)?)?|T(?:[0-9]+H(?:[0-9]+M)?|[0-9]+M))$/,
     
     // MITRE ATT&CK technique format (e.g., T1566, T1566.001)
     MITRE_TECHNIQUE: /^T[0-9]{4}(?:\.[0-9]{3})?$/,
     
-    // Valid tactic name format (PascalCase)
-    TACTIC_NAME: /^[A-Z][a-zA-Z]{2,30}$/,
+    // Valid tactic name format - Updated to allow spaces for real MITRE tactics like "Credential Access"
+    TACTIC_NAME: /^[A-Z][a-zA-Z\s]{2,30}$/,
     
-    // Valid entity type format (PascalCase)
-    ENTITY_TYPE: /^[A-Z][a-zA-Z0-9]*$/,
+    // Valid entity type format (PascalCase) - Updated to enforce reasonable length limit
+    ENTITY_TYPE: /^[A-Z][a-zA-Z0-9]{0,49}$/,
     
-    // Valid connector ID format - Updated to match real connector IDs from Content Hub
-    CONNECTOR_ID: /^[A-Za-z][A-Za-z0-9_-]*$/
+    // Valid connector ID format - Updated to match real connector IDs including dots, numbers, etc.
+    CONNECTOR_ID: /^[A-Za-z0-9][A-Za-z0-9_.-]*$/
 } as const;
 
 // ============================================================================
