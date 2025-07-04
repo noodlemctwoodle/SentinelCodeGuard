@@ -18,9 +18,18 @@ on:
         type: boolean
         default: true
 
+# Default permissions for the workflow (most restrictive)
+permissions:
+  contents: read
+
 jobs:
   check-release:
     runs-on: ubuntu-latest
+    
+    # Explicit permissions for check-release job (read-only)
+    permissions:
+      contents: read
+    
     outputs:
       should-release: ${{ steps.check.outputs.should-release }}
       version: ${{ steps.check.outputs.version }}
@@ -137,8 +146,10 @@ jobs:
     needs: check-release
     if: needs.check-release.outputs.should-release == 'true'
     runs-on: ubuntu-latest
+    
+    # Explicit permissions for release job (needs write access)
     permissions:
-      contents: write  # Required for creating releases and tags
+      contents: write  # Required for creating releases, tags, and checkout
       
     steps:
       - name: Checkout code
