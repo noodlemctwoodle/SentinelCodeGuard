@@ -618,7 +618,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.1",
-    "@types/vscode": "^1.125.0",
+    "@types/vscode": "^1.134.0",
     "@typescript-eslint/eslint-plugin": "^8.63.0",
     "@typescript-eslint/parser": "^8.63.0",
     "@vscode/test-electron": "^3.0.0",
