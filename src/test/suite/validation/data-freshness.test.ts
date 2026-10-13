@@ -38,7 +38,7 @@ suite('Data Freshness Tests', () => {
         
         // Check for well-known tactics
         const tacticNames = tactics.map((t: any) => t.name);
-        const expectedTactics = ['Initial Access', 'Execution', 'Persistence', 'Defense Evasion'];
+        const expectedTactics = ['Initial Access', 'Execution', 'Persistence', 'Defense Impairment'];
         
         expectedTactics.forEach(expectedTactic => {
             assert.ok(tacticNames.includes(expectedTactic), 
