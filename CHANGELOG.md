@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Releases prior to 26.7.2 are listed on the
 [GitHub Releases](https://github.com/noodlemctwoodle/Sentinel-As-Code-Toolkit/releases) page.
 
+## [Unreleased]
+
+### Changed
+
+- MITRE ATT&CK data is updated to v19.2 (Enterprise, Mobile, and ICS), and the
+  Content Hub connector data is refreshed.
+- ATT&CK v19 renamed Defense Evasion to Stealth and moved part of it into a new
+  Defense Impairment tactic. Microsoft Sentinel still only accepts `DefenseEvasion`,
+  so completions, hovers, and validation keep using it, and a rule or hunting query
+  that lists `Stealth` or `DefenseImpairment` gets a warning suggesting `DefenseEvasion`.
+
 ## [26.10.2] - 2026-10-08
 
 The October 2026 release. It combines everything from 26.10.0 and 26.10.1 with

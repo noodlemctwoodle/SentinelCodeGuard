@@ -13,7 +13,7 @@
 A complete detection-as-code authoring environment for Microsoft Sentinel and Microsoft Defender XDR content — everything you need to write, validate, and shape repository-ready files without leaving the editor:
 
 - **Author** Sentinel analytics rules and hunting queries as YAML, with real-time validation, IntelliSense, and starter templates.
-- **Validate** against the Sentinel and Defender XDR schemas, plus multi-framework MITRE ATT&CK (Enterprise, Mobile, and ICS; v14 to v16).
+- **Validate** against the Sentinel and Defender XDR schemas, plus multi-framework MITRE ATT&CK (Enterprise, Mobile, and ICS; ATT&CK v19 data, with tactics kept to the names Sentinel accepts).
 - **Format** every Sentinel-as-Code content type into canonical shape — analytics rules, hunting queries, and parsers (YAML), and automation rules, summary rules, watchlists, workbooks, and playbooks (JSON).
 - **Scaffold** new content — analytics rules, hunting queries, parsers, summary rules, automation rules, and watchlists — as commented YAML, choosing where each file is saved.
 - **Auto-fill** a rule's `requiredDataConnectors` from the KQL tables in its query, using the bundled Content Hub mapping — and register your own custom `_CL` tables in a workspace `.sentinel-connectors.json` when they aren't in the catalogue.
