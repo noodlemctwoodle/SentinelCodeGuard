@@ -10,6 +10,17 @@ import * as path from 'path';
 export const MITRE_TACTIC_FIELDS: string[] = ['tactics'];
 export const MITRE_TECHNIQUE_FIELDS: string[] = ['relevantTechniques', 'techniques', 'mitreTechniques'];
 
+/**
+ * ATT&CK v19 renamed Defense Evasion (TA0005) to Stealth and moved part of it into a
+ * new Defense Impairment tactic (TA0112). Microsoft Sentinel's tactic enum still only
+ * accepts DefenseEvasion, so both fold back into it. Stealth kept TA0005, so only it
+ * supplies the DefenseEvasion tactic details.
+ */
+const SENTINEL_TACTIC_ALIASES: Record<string, { sentinelTactic: string; describesTactic: boolean }> = {
+    Stealth: { sentinelTactic: 'DefenseEvasion', describesTactic: true },
+    DefenseImpairment: { sentinelTactic: 'DefenseEvasion', describesTactic: false }
+};
+
 interface MitreTechnique {
     id: string;
     name: string;
@@ -176,9 +187,14 @@ export class MitreLoader {
         for (const tacticObj of tacticObjects) {
             const externalRef = tacticObj.external_references?.find(ref => ref.source_name === 'mitre-attack');
             if (externalRef && tacticObj.name) {
-                const tacticName = this.formatTacticName(tacticObj.name);
+                const attackName = this.formatTacticName(tacticObj.name);
+                const alias = SENTINEL_TACTIC_ALIASES[attackName];
+                const tacticName = alias?.sentinelTactic ?? attackName;
                 this.tactics.add(tacticName);
-                
+                if (alias && !alias.describesTactic) {
+                    continue;
+                }
+
                 // Only add if not already exists, or if this is a more complete definition
                 if (!this.tacticDetails.has(tacticName) || !this.tacticDetails.get(tacticName)?.id) {
                     this.tacticDetails.set(tacticName, {
@@ -201,9 +217,9 @@ export class MitreLoader {
         for (const techniqueObj of techniqueObjects) {
             const externalRef = techniqueObj.external_references?.find(ref => ref.source_name === 'mitre-attack');
             if (externalRef && techniqueObj.name) {
-                const tactics = techniqueObj.kill_chain_phases
+                const tactics = [...new Set(techniqueObj.kill_chain_phases
                     ?.filter(phase => phase.kill_chain_name === 'mitre-attack')
-                    .map(phase => this.formatTacticName(phase.phase_name.replace(/-/g, ' '))) || [];
+                    .map(phase => this.toSentinelTactic(this.formatTacticName(phase.phase_name.replace(/-/g, ' ')))) || [])];
 
                 const isSubTechnique = techniqueObj.x_mitre_is_subtechnique === true;
                 const techniqueId = externalRef.external_id;
@@ -247,6 +263,10 @@ export class MitreLoader {
             .split(/[-\s]+/)
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join('');
+    }
+
+    private static toSentinelTactic(tacticName: string): string {
+        return SENTINEL_TACTIC_ALIASES[tacticName]?.sentinelTactic ?? tacticName;
     }
 
     // Public API methods with data validation
@@ -341,6 +361,16 @@ export class MitreLoader {
         const strictValidation = config.get('mitre.strictValidation', false);
 
         const isValidFormat = /^[A-Z][a-zA-Z]{2,30}$/.test(tactic);
+
+        const sentinelTactic = SENTINEL_TACTIC_ALIASES[tactic]?.sentinelTactic;
+        if (sentinelTactic) {
+            return {
+                isKnown: false,
+                isValidFormat: true,
+                message: `Microsoft Sentinel does not accept the ATT&CK v19 tactic '${tactic}'. Use '${sentinelTactic}' instead.`,
+                severity: vscode.DiagnosticSeverity.Warning
+            };
+        }
 
         // If data isn't loaded, be more permissive
         if (!this.dataLoaded) { // Updated reference

@@ -101,6 +101,37 @@ suite('MitreLoader Tests', () => {
         assert.ok(Array.isArray(tactics), 'Should return array for valid tactics');
         assert.ok(Array.isArray(allTactics), 'Should return array for all tactics');
     });
+
+    test('Should fold the ATT&CK v19 Stealth and Defense Impairment tactics into DefenseEvasion', () => {
+        assert.ok(MitreLoader.hasDataLoaded(), 'MITRE data should load from data/');
+
+        const tactics = MitreLoader.getValidTactics();
+        assert.ok(tactics.includes('DefenseEvasion'), 'DefenseEvasion should stay a valid tactic');
+        assert.ok(!tactics.includes('Stealth'), 'Stealth is not a Sentinel tactic');
+        assert.ok(!tactics.includes('DefenseImpairment'), 'DefenseImpairment is not a Sentinel tactic');
+
+        const details = MitreLoader.getTacticDetails('DefenseEvasion');
+        assert.strictEqual(details?.id, 'TA0005');
+        assert.strictEqual(details?.framework, 'enterprise');
+
+        const techniques = MitreLoader.getAllTechniques();
+        assert.ok(techniques.every(t => !t.tactics.includes('Stealth') && !t.tactics.includes('DefenseImpairment')),
+            'Technique tactics should use Sentinel names');
+        assert.ok(techniques.some(t => t.framework === 'enterprise' && t.tactics.includes('DefenseEvasion')),
+            'Enterprise techniques should map to DefenseEvasion');
+    });
+
+    test('Should warn when a rule uses an ATT&CK v19 tactic name Sentinel rejects', () => {
+        for (const tactic of ['Stealth', 'DefenseImpairment']) {
+            const result = MitreLoader.validateTactic(tactic);
+            assert.strictEqual(result.isKnown, false);
+            assert.strictEqual(result.severity, vscode.DiagnosticSeverity.Warning);
+            assert.ok(result.message?.includes("'DefenseEvasion'"), `${tactic} should suggest DefenseEvasion`);
+        }
+
+        const valid = MitreLoader.validateTactic('DefenseEvasion');
+        assert.ok(valid.isKnown, 'DefenseEvasion should be a known tactic');
+    });
 });
 
 suite('MITRE Validation Tests', () => {
